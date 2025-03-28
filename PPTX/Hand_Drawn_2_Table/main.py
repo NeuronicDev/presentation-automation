@@ -9,7 +9,7 @@ from io import BytesIO
 import logging
 
 client = OpenAI(
-    api_key="AIzaSyAv0sTw83EOKcJtoSyT9ug4cnzwGagkMJY",
+    api_key="API-key",
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 

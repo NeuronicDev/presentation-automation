@@ -4,7 +4,7 @@ import requests
 import json
 
 # Groq API Configuration
-API_KEY = "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"
+API_KEY = "API-key"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 HEADERS = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
 

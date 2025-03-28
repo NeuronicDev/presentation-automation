@@ -53,7 +53,7 @@
 
 // // Step 3: Function to send extracted text to Groq API
 // async function validateStickyNotes(textArray) {
-//   const API_KEY = "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"; 
+//   const API_KEY = "API-key"; 
 //   const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 //   const prompt = `Extract and return only the instructional content from the following text.
@@ -164,7 +164,7 @@ Office.onReady((info) => {
   
   // Function to send extracted text to Groq API for filtering
   async function validateStickyNotes(textArray) {
-  const API_KEY = "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"; 
+  const API_KEY = "API-key"; 
   const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
   
   const prompt = `Extract and return only the instructional content from the following text.
