@@ -8,10 +8,10 @@ from feedback_parsing.feedback_classifier import classify_feedback_instructions
 from agents.formatting_agent import formatting_agent
 from agents.cleanup_agent import cleanup_agent
 from agents.visual_enhancement_agent import visual_enhancement_agent
-from utils.utils import generate_slide_context
+from utils.utils import generate_slide_context, convert_pptx_to_pdf
 from code_manipulation.code_generator import generate_python_code
 from code_manipulation.code_executor import execute_code_in_docker
-from config.config import LIBREOFFICE_PATH
+
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -46,18 +46,7 @@ def main(pptx_path):
         logging.info("Loading presentation...")
         prs = Presentation(pptx_path)
 
-        pdf_path = pptx_path.replace(".pptx", ".pdf")
-        logging.info(f"Converting {pptx_path} to PDF at {pdf_path}...")
-        try:
-            subprocess.run(
-                [LIBREOFFICE_PATH, "--headless", "--convert-to", "pdf", pptx_path, "--outdir", os.path.dirname(pptx_path)],
-                check=True
-            )
-            logging.info(f"Successfully converted {pptx_path} to {pdf_path}")
-        except subprocess.CalledProcessError as e:
-            logging.error(f"Failed to convert PPTX to PDF: {e}")
-            sys.exit(1)
-
+        pdf_path = convert_pptx_to_pdf(pptx_path)
 
         image_cache = {}
         slide_context_cache = {}
@@ -111,11 +100,13 @@ def main(pptx_path):
             slide_context = slide_context_cache[slide_number]
             code = generate_python_code(task_specification, slide_context)
             if code:
-                tasks_with_code .append({
+                tasks_with_code.append({
                     "slide_number": slide_number,
                     "generated_code": code,
                     "original_instruction": task_specification["original_instruction"],
-                    "description": task_specification["task_description"]
+                    "description": task_specification["task_description"],
+                    "action": task_specification["action"],
+                    "target_element_hint": task_specification.get("target_element_hint", ""),
                 })
                 logging.info(f"Generated code for task: {task_specification['task_description']}")
             else:
@@ -153,8 +144,14 @@ def main(pptx_path):
 
 
 if __name__ == "__main__":
-    pptx_path = os.path.abspath("font_test1.pptx")
-    # pptx_path = os.path.abspath("cleanup_test.pptx")
+    pptx_path = os.path.abspath("./input_ppts/pptx/font_test1.pptx")
+    # pptx_path = os.path.abspath("./input_ppts/pptx/font_test2.pptx")
+    # pptx_path = os.path.abspath("./input_ppts/pptx/cleanup_test1.pptx")
+    # pptx_path = os.path.abspath("./input_ppts/pptx/cleanup_test2.pptx")
+    # pptx_path = os.path.abspath("./input_ppts/pptx/table_alignment_test1.pptx")
+    # pptx_path = os.path.abspath("./input_ppts/pptx/table_alignment_test2.pptx")
+    # pptx_path = os.path.abspath("./input_ppts/pptx/consistent.pptx")
+    # pptx_path = os.path.abspath("./input_ppts/pptx/consistent3.pptx")
 
     logging.info(f"input pptx: {pptx_path}")
     main(pptx_path)

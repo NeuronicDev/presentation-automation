@@ -22,7 +22,7 @@ def _is_annotation_color(shape_fill, target_colors: List[RGBColor]) -> bool:
                     return False
                 return shape_fill.fore_color.rgb in target_colors
         except AttributeError:
-            logging.debug("AttributeError checking shape fill color.")
+            logging.info("AttributeError checking shape fill color.")
             return False
     return False
 
@@ -42,7 +42,7 @@ def extract_feedback_from_ppt_onslide(pptx_filepath: str, annotation_keywords: O
 
     #     for i, slide in enumerate(prs.slides):
     #         slide_number = i + 1
-    #         logging.debug(f"Processing slide {slide_number}...")
+    #         logging.info(f"Processing slide {slide_number}...")
     #         for shape in slide.shapes:
     #             is_feedback = False
     #             instruction_text = ""
@@ -54,7 +54,7 @@ def extract_feedback_from_ppt_onslide(pptx_filepath: str, annotation_keywords: O
     #                     if shape_text_lower.startswith(keyword):
     #                         instruction_text = shape.text_frame.text.strip()
     #                         is_feedback = True
-    #                         logging.debug(f"Slide {slide_number}: Found feedback shape by keyword '{keyword}' (Shape ID: {shape.shape_id})")
+    #                         logging.info(f"Slide {slide_number}: Found feedback shape by keyword '{keyword}' (Shape ID: {shape.shape_id})")
     #                         break 
                         
     #             # 2. If not found by keyword, check if shape's fill color matches
@@ -64,9 +64,9 @@ def extract_feedback_from_ppt_onslide(pptx_filepath: str, annotation_keywords: O
     #                         instruction_text = shape.text_frame.text.strip()
     #                         if instruction_text:
     #                             is_feedback = True
-    #                             logging.debug(f"Slide {slide_number}: Found feedback shape by color '{shape.fill.fore_color.rgb}' (Shape ID: {shape.shape_id})")
+    #                             logging.info(f"Slide {slide_number}: Found feedback shape by color '{shape.fill.fore_color.rgb}' (Shape ID: {shape.shape_id})")
     #                     else:
-    #                         logging.debug(f"Slide {slide_number}: Shape matched color but had no text (Shape ID: {shape.shape_id})")
+    #                         logging.info(f"Slide {slide_number}: Shape matched color but had no text (Shape ID: {shape.shape_id})")
 
 
     #             # 3. If identified as feedback (and has text), add to list
@@ -94,7 +94,7 @@ def extract_feedback_from_ppt_onslide(pptx_filepath: str, annotation_keywords: O
     #                 }
     #                 feedback_list.append(feedback_item)
 
-    #         logging.debug(f"Finished processing slide {slide_number}.")
+    #         logging.info(f"Finished processing slide {slide_number}.")
 
     #     logging.info(f"Finished on-slide extraction. Found {len(feedback_list)} feedback items.")
     # except PackageNotFoundError:

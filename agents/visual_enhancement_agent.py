@@ -3,6 +3,10 @@ from typing import Dict, Any, List
 from langchain_core.messages import HumanMessage
 
 from config.llm_provider import gemini_flash_llm
+from config.config import LLM_API_KEY
+
+from google import genai
+client = genai.Client(api_key=LLM_API_KEY)
 
 VISUAL_ENHANCEMENT_TASK_DESCRIPTION_PROMPT  = """
     You are an expert AI assistant acting as a bridge between a parsed user request and a PowerPoint code generator. 
@@ -35,7 +39,7 @@ VISUAL_ENHANCEMENT_TASK_DESCRIPTION_PROMPT  = """
     *   **EXISTS** in the current state of the slide.
     *   **WHAT** change needs to be made.
     *   **WHERE** it applies.
-    *   **HOW and ON WHICH ELEMENTS** it should be done.
+    *   **HOW and ON WHICH ELEMENTS** it should the changes be done such that origial user instruction is met.
     *   Relate it back to the **Original User Request** for context.
 
     **Output Format:**
@@ -64,21 +68,10 @@ def visual_enhancement_agent(classified_instruction: Dict[str, Any], slide_conte
 
         slide_xml = slide_context.get("slide_xml_structure", "")
         slide_image_base64 = slide_context.get("slide_image_base64", "")
+        slide_image_bytes = slide_context.get("slide_image_bytes", "")
 
         final_prompt = []
-        
-        slide_image_text_prompt = {
-            "type": "text",  
-            "text": "The below is the image of the slide. Please also use this as a reference to generate the description.",
-        }
-        final_prompt.append(slide_image_text_prompt)
-        
-        slide_image_base64_prompt = {
-            "type": "image_url",
-            "image_url": {"url": f"data:image/png;base64,{slide_image_base64}"},
-        }
-        final_prompt.append(slide_image_base64_prompt)
-        
+
         main_prompt = VISUAL_ENHANCEMENT_TASK_DESCRIPTION_PROMPT.format(
             original_instruction=original_instruction,
             slide_number=slide_number,
@@ -88,10 +81,17 @@ def visual_enhancement_agent(classified_instruction: Dict[str, Any], slide_conte
             slide_xml_structure=slide_xml,
         )
         final_prompt.append(main_prompt) 
-            
+
+        # slide_image_text_prompt = "The below is the image of the slide. Please also use this as a reference to generate the description."
+        slide_image_text_prompt ="The below is the image of the slide. Please also use this as a reference to generate the description. Analyse what text, images, shapes, other elements, structure and layout are currently present on the slide"
+        
+        final_prompt.append(slide_image_text_prompt)
+        image = genai.types.Part.from_bytes(data=slide_image_bytes, mime_type="image/png") 
+      
         try:
-            response = gemini_flash_llm.invoke([HumanMessage(content=final_prompt)])
-            description = response.strip()
+            response = client.models.generate_content(model="gemini-2.0-flash", contents=[final_prompt, image])
+            description = response.text.strip()
+            # logging.info(f"visual_enhancement_agent generated description: {description}")
         except Exception as e:
             logging.error(f"Error generating description for visual_enhancement_agent task: {e}")
             description = "Failed to generate description."
@@ -106,7 +106,7 @@ def visual_enhancement_agent(classified_instruction: Dict[str, Any], slide_conte
             "params": params
         }
         processed_subtasks.append(flattened_task)
-        logging.debug(f"visual_enhancement_agent processed sub-task: {action} for slide {slide_number}")
+        logging.info(f"visual_enhancement_agent processed sub-task: {action} for slide {slide_number}")
 
     return processed_subtasks
 

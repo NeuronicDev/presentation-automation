@@ -86,7 +86,7 @@ def parse_feedback_instruction(instruction_item: Dict[str, Any]) -> Optional[Dic
         })
         
         raw_response_text = response.strip()
-        logging.debug(f"LLM Raw Response: {raw_response_text}")
+        logging.info(f"LLM Raw Response: {raw_response_text}")
 
         json_match = None
         try:

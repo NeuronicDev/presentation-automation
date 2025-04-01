@@ -26,3 +26,9 @@ CMD ["python", "executor_script.py"]
 # # Use explicit entrypoint to ensure environment is loaded
 # ENTRYPOINT ["/bin/bash", "-c"]
 # CMD ["python executor_script.py"]
+
+# RUN apt-get update && apt-get install -y \
+#     tesseract-ocr \
+#     poppler-utils \
+#     build-essential \
+#     && rm -rf /var/lib/apt/lists/*

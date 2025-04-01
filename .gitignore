@@ -4,11 +4,18 @@ __pycache__/
 
 
 *.log
+*.pptx
+*.ppt
+*.pdf
+*.xlsx
+*.docx
+*.doc
 
 .pdm.toml
 
 __pypackages__/
-
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
 
 **/.vscode/
 **/.vscode

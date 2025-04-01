@@ -6,41 +6,117 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import HumanMessage
 
 from config.llm_provider import gemini_flash_llm  
+from config.config import LLM_API_KEY
 
+from google import genai
+client = genai.Client(api_key=LLM_API_KEY)
 
 CODE_GENERATION_PROMPT = """
-    You are an expert AI code generator specialized in creating Python code using the `python-pptx` library to manipulate PowerPoint presentations.
-    Your task is to generate precise, executable Python code snippets to modify a PowerPoint slide based on the provided task details and slide context.
+    # PowerPoint Automation Expert
+
+    You are a **State-of-the-Art expert Python code generator** and PowerPoint automation engineer with deep expertise in producing error-free, production-ready code using python-pptx library and PowerPoint's object model to manipulate PowerPoint presentations.
+    Your task is to generate precise, executable Python code to modify a PowerPoint slide based on the provided feedback instruction, task details and slide context.
+    Your generated code will be executed within a specific environment where `prs` (the Presentation object) and `slide` (the target Slide object, if applicable) are already defined in the execution scope. Use them directly.
     Ensure the generated code accurately performs the specified action on the target element(s) while preserving the original slide content.
 
-    **Input Context:**
-    - Agent: {agent_name}
-    - Slide Index: {slide_index}
-    - Original Instruction: {original_instruction}
-    - Task Description: {task_description}
-    - Action: {action}
-    - Target Element Hint: {target_element_hint}
-    - Parameters: {params}
-    - Slide XML Structure: {slide_xml_structure}
 
-
-    **Instructions & Assumptions:**
-    - Understand the task description and original instruction provided by the agent.
-    - Analyze the slide's current state using the provided image and XML structure and determine the changes to be made.
-    - Identify the target element(s) based on the `target_element_hint` and the slide's context.
-    - Assume you are working within a Python environment where the `python-pptx` library is already imported and available as `pptx`.
-    - Assume you have access to a `slide` object representing the target slide (already obtained from `prs.slides[slide_index]`).
-    - You have access to `pptx.util` for units like `Pt`, `Inches`, etc and use them where appropriate.
-    - You have access to `pptx.enum.text` and other relevant `python-pptx` enums if needed.
-    - Handle potential errors gracefully within the snippet if possible (e.g., check `shape.has_text_frame` before accessing `text_frame`).  
-    - Ensure the original text and data remain intact after applying the modifications. Do not create new content.  
-    - Ensure the code is executable and modifies the slide accurately based on the specified action and parameters.
-
-
-    **Output:** 
-    - Provide **only** the executable Python code snippet as text.  Do not include any preamble, explanations, comments or markdown formatting. JUST the code.
-    - Ensure the code snippet is formatted correctly and ready for execution within a Python environment.
+    ## Instructions:
+        - Understand the task description and original instruction provided by the agent.
+        - Analyze the slide's current state using the provided image and XML structure and determine the changes to be made.
+        - Identify the target element(s) based on the `target_element_hint` and the slide's context(visual image and XML structure).
+        - You should not assume anything which is not in the slide context. Use image and XML structure to understand the slide and give code accordingly.
+        - The MOST IMPORTANT requirement is to generate Python code that is **directly executable** and **free of errors**. Pay extreme attention to `python-pptx` syntax, correct attribute and method names, and proper import statements.
     
+    ## Input Context:
+        - Agent: {agent_name}
+        - Slide Index: {slide_index}
+        - Original Instruction: {original_instruction}
+        - Task Description: {task_description}
+        - Action: {action}
+        - Target Element Hint: {target_element_hint}
+        - Parameters: {params}
+        - Slide XML Structure: {slide_xml_structure}
+
+
+    ## IMPORTANT: Python-PPTX Technical Guidance & Best Practices:
+
+    1. **Slide Properties:**
+    - Access slide dimensions via `prs.slide_width` and `prs.slide_height` (NOT slide.slide_width)
+    - All position/size values are in EMU units (English Metric Units)
+    - Convert units with `pptx.util.Inches()`, `pptx.util.Pt()`, or `pptx.util.Cm()`
+
+    2. **Shape Manipulation:**
+    - Always verify shape properties before access: `if shape.has_text_frame:`, `if shape.has_table:`, etc.
+    - Access text with shape.text_frame and paragraphs[0].runs[0].text
+    - Shapes have properties: `.left`, `.top`, `.width`, `.height`, `.rotation`, `.name`, `.shape_type`, `.add_shape()` etc.
+    - Shape types include: `shape.shape_type`, MSO_SHAPE_TYPE enum from pptx.enum.shapes
+    - Access shapes by index: `slide.shapes[0]` or iterate: `for shape in slide.shapes:`
+    - Find shapes by name: `[s for s in slide.shapes if s.name == "target_name"]`
+    - Different shape types (`shape.shape_type`) have different properties.
+    - Basic shapes (AutoShapes, TextBoxes) often have direct `.fill` and `.line` attributes.
+    - Container shapes like `GraphicFrame` (MSO_SHAPE_TYPE.GRAPHIC_FRAME, which holds Tables, Charts, SmartArt) DO NOT have a direct `.fill`. You must access the object inside (e.g., `shape.table`, `shape.chart`) and format its components (cells, plot area).
+    - **ALWAYS check `shape.shape_type` or use `hasattr(shape, 'fill')` before attempting to access attributes like `.fill` or `.line` to avoid AttributeErrors.**
+
+    3. **Text Operations:**
+    - Text frame access: `shape.text_frame.text = "New text"`
+    - Paragraph formatting: `paragraph.alignment`, `paragraph.level`, `paragraph.space_before`, from pptx.enum.text import PP_PARAGRAPH_ALIGNMENT
+    - Run properties: `run.font.size`, `run.font.bold`, `run.font.color.rgb`
+    - Auto-size: `text_frame.auto_size = MSO_AUTO_SIZE.SHAPE_TO_FIT_TEXT`
+
+    4. **Table Operations:**
+    - Create tables with shapes.add_table(rows, cols, x, y, cx, cy)
+    - Table access: `table = shape.table`
+    - Cell access: `cell = table.cell(row_idx, col_idx)`
+    - Format cells with table.cell(row, col).fill.solid(), table.cell(row, col).text_frame
+    - Cell properties: `cell.text`, `cell.fill`, `cell.margin_x`
+    - Table dimensions: `table.rows`, `table.columns`
+    - Set line properties with shape.line.width, shape.line.color, shape.line.dash_style
+
+    5. **Color Operations:**
+    - from pptx.dml.color import RGBColor
+    - RGB colors: `RGBColor(r, g, b)` where r,g,b are 0-255
+    - Theme colors: `MSO_THEME_COLOR.ACCENT_1`
+    - Shape fill: `shape.fill.solid()`, `shape.fill.fore_color.rgb = RGBColor(r,g,b)`
+    
+    6. **Positioning Relative to Table Cells:**
+    - Individual table cells (`table.cell(r, c)`) DO NOT have `.left` or `.top` attributes.
+    - To position a shape (e.g., an icon) visually within or near a cell at `(row, col)`, you MUST calculate its position relative to the TABLE's shape:
+     1. Get the table shape's position: `table_shape = ...`, `table_left = table_shape.left`, `table_top = table_shape.top`.
+     2. Calculate the sum of widths of columns *before* `col`: `left_offset = sum(table.columns[c].width for c in range(col))`.
+     3. Calculate the sum of heights of rows *before* `row`: `top_offset = sum(table.rows[r].height for r in range(row))`.
+     4. The approximate cell position is `(table_left + left_offset, table_top + top_offset)`.
+     5. Add the new shape to the `slide.shapes` collection using these calculated coordinates (plus any desired padding).
+   - Use `try...except` when accessing column widths and row heights as indices might be invalid. Handle potential `AttributeError` if `.width` or `.height` aren't available directly.
+    
+    7. **Error Prevention:**
+    - ALWAYS use try/except blocks for operations that might fail
+    - Check if shapes exist before modification
+    - Verify attribute existence before access. Do NOT use attributes that may not exist.
+    - Use relative positioning rather than hardcoded coordinates
+    - Preserve existing content unless explicitly told to modify
+
+
+    **Common Tasks:**
+        *   **Text:** Access `shape.text_frame`, `tf.paragraphs`, `p.runs`, `run.font` (use `run.font.name`, `.size = Pt(...)`, `.bold = True`, `.color.rgb = RGBColor(...)`), `p.alignment = PP_ALIGN...`. Check `shape.has_text_frame` first.
+        *   **Position/Size:** Use `shape.left`, `shape.top`, `shape.width`, `shape.height`. Use `Inches()` or `Emu()` for setting values. Calculate relative positions where possible.
+        *   **Fill/Line:** Access `shape.fill` (`fill.solid()`, `fill.fore_color.rgb = RGBColor(...)`), `shape.line` (`line.color.rgb = ...`, `line.width = Pt(...)`). Check fill/line type first if needed (`fill.type == MSO_FILL_TYPE...`).
+        *   **Adding Shapes:** Use `slide.shapes.add_textbox(...)`, `add_picture(...)`, `add_shape(MSO_AUTO_SHAPE_TYPE..., left, top, width, height)`, `add_table(...)`, `add_connector(MSO_CONNECTOR_TYPE..., begin_x, begin_y, end_x, end_y)`.
+        *   **Deleting Shapes:** This requires accessing the internal XML element: `sp = shape._sp`, then `sp.getparent().remove(sp)`. Use this pattern carefully within a loop (iterate over a *copy* of shapes list if deleting).
+        *   **Tables:** Access `shape.table`, `table.cell(r, c)`, `cell.text_frame`. Formatting involves iterating cells/rows/columns. Merging is `cell.merge(...)`.
+        *   **Charts:** Create charts with slide.shapes.add_chart(chart_type, x, y, cx, cy, chart_data), Access `shape.chart`, `chart.series[0].values`, `chart.plots[0].categories`, `chart.plots[0].has_data_labels = True`, `chart.plots[0].data_labels.show_value = True`.  
+        *   **Connectors:** After adding, use `connector.begin_connect(shape, connection_site_index)` and `connector.end_connect(...)`.
+        *   **Layout:** `python-pptx` has no high-level "align top" or "distribute". You MUST calculate the required `left`, `top`, `width`, `height` values based on `prs.slide_width/height`, other shapes' positions, and the `task_description`. Example: To center horizontally: `shape.left = (prs.slide_width - shape.width) // 2`.
+
+    **Specialized Layout Techniques:**
+    - **Smart Layouts:** For timelines, use `slide.shapes.add_connector()` with calculated spacing; for matrices, standardize cell sizes.    
+    - **Process Flows**: Ensure consistent spacing and sizing of each step. Connect with MSO_CONNECTOR_TYPE.STRAIGHT.
+    - **Tables & Matrices**: Standardize cell sizes and ensure consistent borders using line properties.
+    - **Comparison Layouts**: Maintain visual balance between compared elements with equal sizing.
+    
+    
+    ## OUTPUT FORMAT:
+    Provide ONLY executable Python code without explanations, preamble, or markdown formatting. JUST the code.
+    The code should be ready for immediate execution.
     """
 
 
@@ -54,7 +130,8 @@ def generate_python_code(agent_task_specification: Dict[str, Any], slide_context
         target_element_hint = agent_task_specification.get("target_element_hint")
         params = agent_task_specification.get("params", {})
         slide_xml_structure = slide_context.get("slide_xml_structure")
-        slide_image_base64 = slide_context.get("slide_image_base64")   
+        slide_image_base64 = slide_context.get("slide_image_base64") 
+        slide_image_bytes = slide_context.get("slide_image_bytes")  
 
         main_prompt = CODE_GENERATION_PROMPT.format(
             agent_name=agent_name,
@@ -67,31 +144,21 @@ def generate_python_code(agent_task_specification: Dict[str, Any], slide_context
             slide_xml_structure=slide_xml_structure,
         )       
         
-        final_prompt = [
-            {
-                "type": "text",
-                "text": "The below is the image of the slide. Use it to understand and visualize the current layout and elements.",
-            },
-            {
-                "type": "image_url",
-                "image_url": {"url": f"data:image/jpeg;base64,{slide_image_base64}"},
-            },
-            {
-                "type": "text",
-                "text": main_prompt,
-            }
-        ]
-        
-        response = gemini_flash_llm.invoke([HumanMessage(content=final_prompt)])
-        
+        final_prompt = [main_prompt]
+        slide_image_text_prompt = "The below is visual representation of the slide image. Use it to understand and visualize the current layout, structure, elements, spacing, overlaps, colors, and styles."
+        final_prompt.append(slide_image_text_prompt)
+
+        image = genai.types.Part.from_bytes(data=slide_image_bytes, mime_type="image/png") 
+                
         try:
-            generated_code_str = response.strip()
-            logging.info(f"Generated code: {generated_code_str}")
+            response = client.models.generate_content(model="gemini-2.0-flash", contents=[final_prompt, image])
+            generated_code_str = response.text.strip()
+            # logging.info(f"Generated code:\n {generated_code_str}")
             code_block = re.search(r'```python\n(.*?)\n```', generated_code_str, re.DOTALL)
             
             if code_block:
                 extracted_code = code_block.group(1)
-                logging.info(f"Extracted code: {extracted_code}")
+                logging.info(f"EXTRACTED CODE:\n {extracted_code}")
                 return extracted_code
             else:
                 logging.info(f"No markdown code block found. Using entire string.")

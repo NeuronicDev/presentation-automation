@@ -8,11 +8,15 @@ import os
 try:
     import pptx
     from pptx import Presentation
-    from pptx.util import Inches, Pt, Emu
+    from pptx.util import Inches, Pt, Emu, Cm
     from pptx.dml.color import RGBColor
     from pptx.enum.text import MSO_AUTO_SIZE, MSO_VERTICAL_ANCHOR, PP_PARAGRAPH_ALIGNMENT, MSO_TEXT_UNDERLINE_TYPE
-    from pptx.enum.shapes import MSO_SHAPE_TYPE, MSO_CONNECTOR_TYPE, MSO_AUTO_SHAPE_TYPE
-    from pptx.enum.dml import MSO_FILL_TYPE     
+    from pptx.enum.shapes import MSO_SHAPE_TYPE, MSO_CONNECTOR_TYPE, MSO_AUTO_SHAPE_TYPE, PP_PLACEHOLDER_TYPE, PP_MEDIA_TYPE
+    from pptx.enum.dml import MSO_FILL_TYPE, MSO_LINE_DASH_STYLE, MSO_COLOR_TYPE, MSO_PATTERN_TYPE, MSO_THEME_COLOR_INDEX
+    from pptx.chart.data import CategoryChartData, ChartData, XyChartData, BubbleChartData
+    from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION, XL_TICK_MARK, XL_TICK_LABEL_POSITION, XL_MARKER_STYLE, XL_DATA_LABEL_POSITION
+    from pptx.enum.action import PP_ACTION_TYPE
+    from pptx.table import Table, _Cell 
 
 except ImportError as import_err:
     print(json.dumps({"status": "failed", "errors": [{"error": f"Import error in container: {import_err}. Ensure Dockerfile installs all dependencies."}]}), file=sys.stderr)
@@ -36,22 +40,59 @@ def execute_code_snippet(code_snippet: str, prs: Presentation, slide_index: int 
 
     try:
         exec_globals = {
-            'pptx': pptx, 
+            
+            # Core Modules/Classes
+            'pptx': pptx,
             'Presentation': Presentation,
+            'Table': Table,
+            '_Cell': _Cell, 
+            'ChartData': ChartData,
+            'CategoryChartData': CategoryChartData,
+            'XyChartData': XyChartData,
+            'BubbleChartData': BubbleChartData, 
+            'PP_ACTION_TYPE': PP_ACTION_TYPE,
+            'PP_PLACEHOLDER_TYPE': PP_PLACEHOLDER_TYPE,
+            'PP_MEDIA_TYPE': PP_MEDIA_TYPE,
+            
+            # Utilities
             'Inches': Inches,
             'Pt': Pt,
             'Emu': Emu,
+            'Cm': Cm,
             'RGBColor': RGBColor,
+
+            # Text Enums
             'MSO_AUTO_SIZE': MSO_AUTO_SIZE,
             'MSO_VERTICAL_ANCHOR': MSO_VERTICAL_ANCHOR,
             'PP_PARAGRAPH_ALIGNMENT': PP_PARAGRAPH_ALIGNMENT,
+            'MSO_TEXT_UNDERLINE_TYPE': MSO_TEXT_UNDERLINE_TYPE,
+
+            # Shape Enums
             'MSO_SHAPE_TYPE': MSO_SHAPE_TYPE,
             'MSO_CONNECTOR_TYPE': MSO_CONNECTOR_TYPE,
+            'MSO_AUTO_SHAPE_TYPE': MSO_AUTO_SHAPE_TYPE,
+            'PP_PLACEHOLDER_TYPE': PP_PLACEHOLDER_TYPE,
+
+            # Fill/Line/Effect Enums
             'MSO_FILL_TYPE': MSO_FILL_TYPE,
-            'MSO_TEXT_UNDERLINE_TYPE': MSO_TEXT_UNDERLINE_TYPE,
-            # Add other necessary imports/enums here
-            '__builtins__': __builtins__ # Standard builtins
+            'MSO_THEME_COLOR_INDEX': MSO_THEME_COLOR_INDEX,
+            'MSO_COLOR_TYPE': MSO_COLOR_TYPE,
+            'MSO_PATTERN_TYPE': MSO_PATTERN_TYPE,
+            'MSO_LINE_DASH_STYLE': MSO_LINE_DASH_STYLE,
+
+            # Chart Enums
+            'XL_CHART_TYPE': XL_CHART_TYPE,
+            'XL_LEGEND_POSITION': XL_LEGEND_POSITION,
+            'XL_MARKER_STYLE': XL_MARKER_STYLE,
+            'XL_DATA_LABEL_POSITION': XL_DATA_LABEL_POSITION,
+            'XL_TICK_MARK': XL_TICK_MARK,
+            'XL_TICK_LABEL_POSITION': XL_TICK_LABEL_POSITION,
+
+            # Standard Builtins
+            '__builtins__': __builtins__
         }
+
+
         exec_locals = {
             'prs': prs, 
             'slide': None,
