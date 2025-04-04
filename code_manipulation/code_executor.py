@@ -116,7 +116,7 @@ def execute_code_in_docker(tasks_with_code: List[Dict[str, Any]], original_pptx_
             while retries < MAX_CODE_EXECUTION_RETRIES:
                 input_json = json.dumps([task])
                 input_bytes = input_json.encode('utf-8')
-                logging.info(f"executing task {task['task_index']} of {len(tasks_to_execute) - 1}............................................")
+                logging.info(f"................................executing task {task['task_index']} of {len(tasks_to_execute) - 1}.................................")
 
                 container = client.containers.run(
                     image=DOCKER_IMAGE_NAME,
@@ -193,7 +193,9 @@ def execute_code_in_docker(tasks_with_code: List[Dict[str, Any]], original_pptx_
                         break
                 else:
                     task["error"] = f"Container failed with status {container_status_code}"
+                    container.remove(force=True)
                     break
+                
                 
             if retries >= MAX_CODE_EXECUTION_RETRIES:
                 logging.error(f"Max retries ({MAX_CODE_EXECUTION_RETRIES}) reached for task {task['task_index']}. Giving up.")
@@ -205,7 +207,7 @@ def execute_code_in_docker(tasks_with_code: List[Dict[str, Any]], original_pptx_
 
         # Copy the modified presentation
         base_filename = os.path.splitext(os.path.basename(original_pptx_path))[0]
-        final_output_filename = f"{base_filename}_modified.pptx"
+        final_output_filename = f"{base_filename}_modified__.pptx"
         final_output_path_host = os.path.join(OUTPUT_DIR, final_output_filename)
         
         shutil.copy2(working_pptx_host_path, final_output_path_host)

@@ -5,7 +5,8 @@ from pdf2image import convert_from_path
 import base64
 from io import BytesIO
 import os
-
+import xml.dom.minidom
+import re
 from config.config import LIBREOFFICE_PATH
 
 
@@ -67,12 +68,34 @@ def convert_pptx_to_pdf(pptx_path, output_dir=None):
 #     return xml_content
 
 
+def extract_slide_xml_from_ppt(pptx_path, slide_number):
+    try:
+        slide_filename = f"ppt/slides/slide{slide_number}.xml"
+        with zipfile.ZipFile(pptx_path, 'r') as zip_ref:
+
+            if slide_filename not in zip_ref.namelist():
+                logging.error(f"Could not find slide {slide_number} XML in {pptx_path}")
+                return None
+            
+            xml_content = zip_ref.read(slide_filename)
+            
+            dom = xml.dom.minidom.parseString(xml_content)
+            pretty_xml = dom.toprettyxml()
+            
+            logging.info(f"Successfully extracted XML for slide {slide_number}")
+            return pretty_xml
+    
+    except Exception as e:
+        logging.error(f"Error extracting slide XML: {e}")
+        return None
+    
     
 def extract_slide_xml(prs, slide_index):
     try:
         slide = prs.slides[slide_index]
         slide_element = slide._element
         xml = etree.tostring(slide_element, encoding='unicode', pretty_print=True, method='xml')
+        logging.info(f"Successfully extracted XML for slide index {slide_index}: {xml}")
         return xml
     except Exception as e:
         logging.error(f"Error extracting XML for slide index {slide_index}: {e}")

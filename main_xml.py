@@ -1,4 +1,4 @@
-import os, logging, json, time, datetime, asyncio, sys, pathlib, subprocess
+import os, logging, json, time, datetime, asyncio, sys, pathlib, subprocess, tempfile, shutil
 import logging.handlers
 from pptx import Presentation
 from feedback_parsing.feedback_extraction_notes import extract_feedback_from_ppt_notes
@@ -8,10 +8,11 @@ from feedback_parsing.feedback_classifier import classify_feedback_instructions
 from agents.formatting_agent import formatting_agent
 from agents.cleanup_agent import cleanup_agent
 from agents.visual_enhancement_agent import visual_enhancement_agent
-from utils.utils import generate_slide_context, convert_pptx_to_pdf
+from utils.utils import generate_slide_context, convert_pptx_to_pdf, extract_slide_xml_from_ppt
 from code_manipulation.code_generator import generate_python_code
 from code_manipulation.code_executor import execute_code_in_docker
-
+from code_manipulation.xml_code_generator import generate_modified_xml_code
+from code_manipulation.xml_code_injector import inject_xml_into_ppt
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -50,8 +51,8 @@ def main(pptx_path):
 
         image_cache = {}
         slide_context_cache = {}        
+        current_slide_xml = {}
 
-        # Step 1: Feedback Extraction
         logging.info("Extracting feedback from all sources...")
         feedback_notes = extract_feedback_from_ppt_notes(pptx_path)
         feedback_onslide = extract_feedback_from_ppt_onslide(pptx_path)
@@ -60,13 +61,18 @@ def main(pptx_path):
         all_feedback = feedback_notes + feedback_onslide + feedback_mail
         logging.info(f"Total feedback instructions extracted: {len(all_feedback)}")
 
-        # Step 2: Instruction Interpretation
         logging.info("Classifying and extracting tasks from feedback...")
         categorized_tasks = classify_feedback_instructions(all_feedback)
         logging.info(f"Categorized Tasks: {categorized_tasks}")
+        
+        ########## copy of original ppt for modification
+        temp_dir = tempfile.mkdtemp(prefix="ppt_xml_")
+        working_pptx_path = os.path.join(temp_dir, "working_copy.pptx")
+        shutil.copy2(pptx_path, working_pptx_path)
+        
 
-        # Step 3: Delegate tasks to specialized agents
         logging.info("Processing Tasks with Agents & Context ---")
+        slide_tasks = {}
         task_specifications = []
         for task in categorized_tasks:
             category = task["category"]
@@ -77,7 +83,7 @@ def main(pptx_path):
             if slide_number not in slide_context_cache:
                 slide_context_cache[slide_number] = generate_slide_context(prs, slide_number, pdf_path, image_cache)
             slide_context = slide_context_cache[slide_number]
-            
+
             # Delegate to appropriate agent
             if category == "formatting":
                 task_with_desc = formatting_agent(task, slide_context)
@@ -91,86 +97,77 @@ def main(pptx_path):
             
             if task_with_desc:
                 task_specifications.extend(task_with_desc)
-    
-        # Step 4: Code Generation
-        logging.info("Generating Python code for task specifications...")
-        tasks_with_code  = []
-        for task_specification in task_specifications:
-            slide_number = task_specification["slide_number"]
-            slide_context = slide_context_cache[slide_number]
-            code = generate_python_code(task_specification, slide_context)
-            if code:
-                tasks_with_code.append({
-                    "slide_number": slide_number,
-                    "generated_code": code,
-                    "original_instruction": task_specification["original_instruction"],
-                    "description": task_specification["task_description"],
-                    "action": task_specification["action"],
-                    "target_element_hint": task_specification.get("target_element_hint", ""),
-                })
-                logging.info(f"Generated code for task: {task_specification['task_description']}")
-            else:
-                logging.warning(f"Failed to generate code for task: {task_specification['task_description']}")
 
-        logging.info(f"Generated {len(tasks_with_code )} code snippets for the given task specifications.")
-
-        # Step 5: Safe Code Execution ---
-        logging.info("Executing Code in Docker...")
-        execution_success, final_output_file_path, execution_report = execute_code_in_docker(tasks_with_code, pptx_path)
-
-        if execution_success:
-            logging.info(f"Code execution completed. Status: {execution_report.get('status', 'unknown')}")
-            if final_output_file_path:
-                    logging.info(f"Modified presentation saved to: {final_output_file_path}")
-            else: 
-                    logging.error("Execution reported success but no output file path was returned.")
-                    execution_success = False 
-
-            if execution_report.get("errors"):
-                    logging.warning(f"Some code snippets failed during execution ({len(execution_report['errors'])}):")
-                    for error_detail in execution_report["errors"]:
-                        logging.warning(f"  - Task Index {error_detail.get('task_index', 'N/A')}: {error_detail.get('error', 'Unknown error')}")
-        else:
-            logging.error("Code execution in Docker failed.")
-            if execution_report.get("errors"):
-                    logging.error("Details of execution failure:")
-                    for error_detail in execution_report["errors"]:
-                        logging.error(f"  - Task Index {error_detail.get('task_index', 'N/A')}: {error_detail.get('error', 'Unknown error')}")
-                        
-        #########################################################   
-        # # Step 6: Validation
-        # logging.info("Validation & Quality Checks ...")
-        # validation_report, validation_success = validate_presentation(pptx_path, final_output_file_path, task_specifications) 
-        # logging.info(f"Validation Completed. Success: {validation_success}, Report: {validation_report}")
-
-        # if not validation_success:
-        #     overall_pipeline_status = "partial_success" 
-
-        validation_report = "Validation not implemented yet."
-        overall_pipeline_status = "success"
+            # Organize subtasks by slide number
+            if task_specifications:
+                for subtask in task_specifications:
+                    subtask_slide = subtask.get("slide_number", slide_number)
+                    if subtask_slide not in slide_tasks:
+                        slide_tasks[subtask_slide] = []
+                    slide_tasks[subtask_slide].append(subtask)
         
-        output_report = { 
-            "execution_report": execution_report,
-            "validation_report": validation_report,
-            "overall_status": overall_pipeline_status,
-            "processed_tasks_count": len(tasks_with_code),
-            "successful_tasks_count": execution_report.get("success_count", 0),
-            "failed_tasks_count": len(execution_report.get("errors", [])),
-            "task_specifications": task_specifications,
-            "code_snippets": tasks_with_code 
-        }
-        logging.info(f"Final Output Report:\n{json.dumps(output_report, indent=2)}")
+                
+        # Now process tasks slide by slide, sequentially applying changes
+        for slide_number, tasks in slide_tasks.items():
+            logging.info(f"Processing {len(tasks)} tasks for slide {slide_number}")
 
+            current_xml = extract_slide_xml_from_ppt(working_pptx_path, slide_number)
+            if not current_xml:
+                logging.error(f"Failed to extract XML for slide {slide_number}. Skipping all tasks for this slide.")
+                continue
+                
+            slide_context = slide_context_cache[slide_number]
+
+            for i, task in enumerate(tasks):
+                task_desc = task.get("task_description", f"Task #{i+1}")
+                logging.info(f"Applying task {i+1}/{len(tasks)} for slide {slide_number}: {task_desc}")
+                
+                modified_xml = generate_modified_xml_code(
+                    original_xml=current_xml, 
+                    agent_task_specification=task,
+                    slide_context=slide_context
+                )
+                
+                if not modified_xml:
+                    logging.error(f"Failed to generate modified XML for task: {task_desc}")
+                    continue
+                    
+                if modified_xml == current_xml:
+                    logging.warning(f"No XML changes made for task: {task_desc}")
+                    continue
+                
+                # Update the current XML state with the modifications
+                current_xml = modified_xml
+                
+                # Inject the modified XML back into the working PPTX
+                success = inject_xml_into_ppt(working_pptx_path, slide_number, modified_xml)
+                
+                if success:
+                    logging.info(f"Successfully applied XML changes for task: {task_desc}")
+                else:
+                    logging.error(f"Failed to inject modified XML for task: {task_desc}")
+                    # Don't continue processing more tasks for this slide if injection failed
+                    break
+        
+  
+        base_filename = os.path.splitext(os.path.basename(pptx_path))[0]
+        final_output_filename = f"{base_filename}_xml_modified.pptx"
+        output_dir = os.path.abspath("./output_ppts")
+        os.makedirs(output_dir, exist_ok=True)
+        final_output_path = os.path.join(output_dir, final_output_filename)
+        
+        shutil.copy2(working_pptx_path, final_output_path)
+        logging.info(f"Final modified presentation saved to: {final_output_path}")
+
+        # Cleanup temp directory
+        shutil.rmtree(temp_dir)
+        
 
     except FileNotFoundError as fnf_err:
         logging.error(f"File not found error during pipeline: {fnf_err}")
-        overall_pipeline_status = "failed"
     except Exception as e:
         logging.error(f"Pipeline failed with an unexpected error: {e}", exc_info=True)
-        overall_pipeline_status = "failed"
-    finally:
-        logging.info(f"--- Pipeline Finished with Overall Status: {overall_pipeline_status} ---")
-        
+
         
 if __name__ == "__main__":
     pptx_path = os.path.abspath("./input_ppts/pptx/font_test1.pptx")

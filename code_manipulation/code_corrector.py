@@ -26,6 +26,19 @@ CODE_CORRECTION_PROMPT = """
     - **Error Message:** 
         "{error_message}"
 
+    **VERIFIED IMPORTS:**
+    import pptx
+    from pptx import Presentation
+    from pptx.util import Inches, Pt, Emu, Cm
+    from pptx.dml.color import RGBColor
+    from pptx.enum.text import MSO_AUTO_SIZE, MSO_VERTICAL_ANCHOR, PP_PARAGRAPH_ALIGNMENT, MSO_TEXT_UNDERLINE_TYPE
+    from pptx.enum.shapes import MSO_SHAPE_TYPE, MSO_CONNECTOR_TYPE, MSO_AUTO_SHAPE_TYPE, PP_PLACEHOLDER_TYPE, PP_MEDIA_TYPE
+    from pptx.enum.dml import MSO_FILL_TYPE, MSO_LINE_DASH_STYLE, MSO_COLOR_TYPE, MSO_PATTERN_TYPE, MSO_THEME_COLOR_INDEX
+    from pptx.chart.data import CategoryChartData, ChartData, XyChartData, BubbleChartData
+    from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION, XL_TICK_MARK, XL_TICK_LABEL_POSITION, XL_MARKER_STYLE, XL_DATA_LABEL_POSITION
+    from pptx.enum.action import PP_ACTION_TYPE
+    from pptx.table import Table, _Cell 
+    
 
     **Instructions:**
     1.  **Understand the Task:** Review the task description to understand the original goal of the code.
