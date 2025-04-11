@@ -14,7 +14,7 @@ GEMINI_FLASH_2_0_MODEL_LITE = "gemini-2.0-flash-lite-001"
 
 LIBREOFFICE_PATH = r"C:\Program Files\LibreOffice\program\soffice.exe"
 
-OUTPUT_DIR = "output_ppts"
+OUTPUT_DIR = "output_ppts/pptx"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 DOCKER_IMAGE_NAME = "ppt-automation-executor:latest"

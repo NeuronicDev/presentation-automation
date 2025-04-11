@@ -81,7 +81,7 @@ def build_docker_image() -> bool:
             client.close()
 
 
-def execute_code_in_docker(tasks_with_code: List[Dict[str, Any]], original_pptx_path: str) -> Tuple[bool, str | None, Dict[str, Any]]:
+def execute_code_in_docker(tasks_with_code: List[Dict[str, Any]], original_pptx_path: str, base_filename_of_original_pptx: str) -> Tuple[bool, str | None, Dict[str, Any]]:
     if not build_docker_image():
         return False, None, {"status": "failed", "errors": [{"error": "Docker image build failed or Docker not available."}]}
 
@@ -94,7 +94,7 @@ def execute_code_in_docker(tasks_with_code: List[Dict[str, Any]], original_pptx_
     client = _get_docker_client()
     container = None
     final_output_path_host = None
-    overall_execution_report = {"status": "unknown", "errors": [], "processed_count": 0, "success_count": 0}
+    overall_execution_report = {"status": "unknown", "processed_count": 0, "success_count": 0, "errors": []}
 
     if not client:
         return False, None, {"status": "failed", "errors": [{"error": "Failed to connect to Docker."}]}
@@ -178,7 +178,7 @@ def execute_code_in_docker(tasks_with_code: List[Dict[str, Any]], original_pptx_
                             logging.error(f"Task {task['task_index']} failed: {error_message}")
                             task["error"] = error_message
                             
-                            corrected_code = generate_code_with_retry(task, error_message, task)
+                            corrected_code = generate_code_with_retry(task["generated_code"], error_message, task)                            
                             if corrected_code:
                                 task["generated_code"] = corrected_code
                                 retries += 1
@@ -206,8 +206,7 @@ def execute_code_in_docker(tasks_with_code: List[Dict[str, Any]], original_pptx_
                 overall_execution_report["errors"].append({"task_index": task["task_index"], "error": task["error"]})
 
         # Copy the modified presentation
-        base_filename = os.path.splitext(os.path.basename(original_pptx_path))[0]
-        final_output_filename = f"{base_filename}_modified__.pptx"
+        final_output_filename = f"{base_filename_of_original_pptx}_python-pptx_modified.pptx"
         final_output_path_host = os.path.join(OUTPUT_DIR, final_output_filename)
         
         shutil.copy2(working_pptx_host_path, final_output_path_host)

@@ -9,8 +9,6 @@ from agents.formatting_agent import formatting_agent
 from agents.cleanup_agent import cleanup_agent
 from agents.visual_enhancement_agent import visual_enhancement_agent
 from utils.utils import generate_slide_context, convert_pptx_to_pdf, extract_slide_xml_from_ppt
-from code_manipulation.code_generator import generate_python_code
-from code_manipulation.code_executor import execute_code_in_docker
 from code_manipulation.xml_code_generator import generate_modified_xml_code
 from code_manipulation.xml_code_injector import inject_xml_into_ppt
 
@@ -36,7 +34,7 @@ def setup_logging(log_file):
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
     
-setup_logging("wns_ppt_logs.log")
+setup_logging("wns_ppt_XML_logs2.log")
 
 
 def main(pptx_path):
@@ -47,7 +45,7 @@ def main(pptx_path):
         logging.info("Loading presentation...")
         prs = Presentation(pptx_path)
 
-        pdf_path = convert_pptx_to_pdf(pptx_path)
+        pdf_path = convert_pptx_to_pdf(pptx_path, output_dir = os.path.abspath("./input_ppts/converted_pdfs"))
 
         image_cache = {}
         slide_context_cache = {}        
@@ -143,10 +141,9 @@ def main(pptx_path):
                 success = inject_xml_into_ppt(working_pptx_path, slide_number, modified_xml)
                 
                 if success:
-                    logging.info(f"Successfully applied XML changes for task: {task_desc}")
+                    logging.info(f"Successfully applied XML changes for task")
                 else:
-                    logging.error(f"Failed to inject modified XML for task: {task_desc}")
-                    # Don't continue processing more tasks for this slide if injection failed
+                    logging.error(f"Failed to inject modified XML for task")
                     break
         
   
@@ -170,8 +167,8 @@ def main(pptx_path):
 
         
 if __name__ == "__main__":
-    pptx_path = os.path.abspath("./input_ppts/pptx/font_test1.pptx")
-    # pptx_path = os.path.abspath("./input_ppts/pptx/font_test2.pptx")
+    # pptx_path = os.path.abspath("./input_ppts/pptx/font_test1.pptx")
+    pptx_path = os.path.abspath("./input_ppts/pptx/font_test2.pptx")
     # pptx_path = os.path.abspath("./input_ppts/pptx/cleanup_test.pptx")
     # pptx_path = os.path.abspath("./input_ppts/pptx/cleanup_test2.pptx")
     # pptx_path = os.path.abspath("./input_ppts/pptx/table_alignment_test.pptx")

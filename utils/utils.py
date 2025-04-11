@@ -10,14 +10,12 @@ import re
 from config.config import LIBREOFFICE_PATH
 
 
-def convert_pptx_to_pdf(pptx_path, output_dir=None):
+def convert_pptx_to_pdf(pptx_path, output_dir):
     
     pptx_path = os.path.abspath(pptx_path)
     filename = os.path.basename(pptx_path)
     filename_without_ext = os.path.splitext(filename)[0]
     
-    if output_dir is None:
-        output_dir = os.path.abspath("./input_ppts/converted_pdfs")
     os.makedirs(output_dir, exist_ok=True)
     
     output_pdf = os.path.join(output_dir, f"{filename_without_ext}.pdf")
@@ -145,4 +143,31 @@ def generate_slide_context(prs, slide_number, pdf_path, image_cache):
         "slide_image_bytes": img_bytes 
     }
     return context
+
+def update_slide_context_cache(pptx_path, pdf_path, slide_context_cache, image_cache):
+    try:
+        # Convert the modified PPTX to PDF
+        output_dir = os.path.dirname(pdf_path)
+        new_pdf_path = convert_pptx_to_pdf(pptx_path, output_dir=output_dir)
+        
+        # Load the modified presentation
+        prs = pptx.Presentation(pptx_path)
+        
+        # Clear existing caches
+        image_cache.clear()
+        
+        # Regenerate context for all existing slides
+        for slide_number in list(slide_context_cache.keys()):
+            if slide_number <= len(prs.slides):
+                slide_context_cache[slide_number] = generate_slide_context(
+                    prs, slide_number, new_pdf_path, image_cache
+                )
+                logging.info(f"Updated context for slide {slide_number}")
+            else:
+                logging.warning(f"Slide {slide_number} no longer exists, removing from cache")
+                del slide_context_cache[slide_number]
+        return slide_context_cache, new_pdf_path
+    except Exception as e:
+        logging.error(f"Error updating slide context cache: {e}")
+        return slide_context_cache, pdf_path
 
