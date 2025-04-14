@@ -1,0 +1,834 @@
+[
+  {
+    "id": "457",
+    "name": "Google Shape;457;p1",
+    "parentGroupId": null,
+    "top": 49.0393700787402,
+    "left": 49.6062992125984,
+    "width": 860.893700787402,
+    "height": 26.1731496062992,
+    "text": "Xxxx",
+    "type": "Placeholder",
+    "altText": "",
+    "zIndex": 0,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 24,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "458",
+    "name": "Google Shape;458;p1",
+    "parentGroupId": null,
+    "top": 103.038897637795,
+    "left": 27.8431496062992,
+    "width": 72,
+    "height": 72,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 1,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "459",
+      "486"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 12,
+      "bold": true,
+      "italic": false
+    }
+  },
+  {
+    "id": "459",
+    "name": "Google Shape;459;p1",
+    "parentGroupId": null,
+    "top": 165.798267716535,
+    "left": 27.8431496062992,
+    "width": 72,
+    "height": 72,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 2,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "458",
+      "460"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 12,
+      "bold": true,
+      "italic": false
+    }
+  },
+  {
+    "id": "460",
+    "name": "Google Shape;460;p1",
+    "parentGroupId": null,
+    "top": 220.129921259843,
+    "left": 27.8431496062992,
+    "width": 72,
+    "height": 72,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 3,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "459"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 12,
+      "bold": true,
+      "italic": false
+    }
+  },
+  {
+    "id": "461",
+    "name": "Google Shape;461;p1",
+    "parentGroupId": null,
+    "top": 224.05062992126,
+    "left": 338.087874015748,
+    "width": 0,
+    "height": 252,
+    "text": "",
+    "type": "Line",
+    "altText": "",
+    "zIndex": 4,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "462",
+    "name": "Google Shape;462;p1",
+    "parentGroupId": null,
+    "top": 224.05062992126,
+    "left": 569.22874015748,
+    "width": 0,
+    "height": 252,
+    "text": "",
+    "type": "Line",
+    "altText": "",
+    "zIndex": 5,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "492"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "463",
+    "name": "Google Shape;463;p1",
+    "parentGroupId": null,
+    "top": 111.209527559055,
+    "left": 107.677480314961,
+    "width": 229.523937007874,
+    "height": 35.4525196850394,
+    "text": "Xxxx",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 6,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "486",
+      "488"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "464",
+    "name": "Google Shape;464;p1",
+    "parentGroupId": null,
+    "top": 96.2444094488189,
+    "left": 139.537086614173,
+    "width": 165.804803149606,
+    "height": 0,
+    "text": "",
+    "type": "Line",
+    "altText": "",
+    "zIndex": 7,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "465"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "465",
+    "name": "Google Shape;465;p1",
+    "parentGroupId": null,
+    "top": 85.4063779527559,
+    "left": 188.774960629921,
+    "width": 67.3290551181102,
+    "height": 21.6759842519685,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 8,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "464"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 14,
+      "bold": false,
+      "italic": true
+    }
+  },
+  {
+    "id": "466",
+    "name": "Google Shape;466;p1",
+    "parentGroupId": null,
+    "top": 150.131732283465,
+    "left": 107.677480314961,
+    "width": 229.68,
+    "height": 57.9715748031496,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 9,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 12,
+      "bold": true,
+      "italic": true
+    }
+  },
+  {
+    "id": "467",
+    "name": "Google Shape;467;p1",
+    "parentGroupId": null,
+    "top": 212.13,
+    "left": 107.677480314961,
+    "width": 229.68,
+    "height": 279.18094488189,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 10,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "491"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 11,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "468",
+    "name": "Google Shape;468;p1",
+    "parentGroupId": null,
+    "top": 111.209527559055,
+    "left": 338.818346456693,
+    "width": 229.523937007874,
+    "height": 35.4525196850394,
+    "text": "Xxxx",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 11,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "487",
+      "488"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "469",
+    "name": "Google Shape;469;p1",
+    "parentGroupId": null,
+    "top": 96.2444094488189,
+    "left": 370.677952755905,
+    "width": 165.804803149606,
+    "height": 0,
+    "text": "",
+    "type": "Line",
+    "altText": "",
+    "zIndex": 12,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "470"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "470",
+    "name": "Google Shape;470;p1",
+    "parentGroupId": null,
+    "top": 85.4063779527559,
+    "left": 419.915826771654,
+    "width": 67.3290551181102,
+    "height": 21.6759842519685,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 13,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "469"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 14,
+      "bold": false,
+      "italic": true
+    }
+  },
+  {
+    "id": "471",
+    "name": "Google Shape;471;p1",
+    "parentGroupId": null,
+    "top": 150.131732283465,
+    "left": 338.818346456693,
+    "width": 229.68,
+    "height": 57.9715748031496,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 14,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 12,
+      "bold": true,
+      "italic": true
+    }
+  },
+  {
+    "id": "472",
+    "name": "Google Shape;472;p1",
+    "parentGroupId": null,
+    "top": 212.13,
+    "left": 338.818346456693,
+    "width": 229.68,
+    "height": 72,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 15,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 11,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "473",
+    "name": "Google Shape;473;p1",
+    "parentGroupId": null,
+    "top": 111.209606299213,
+    "left": 569.959212598425,
+    "width": 206.347007874016,
+    "height": 35.4525196850394,
+    "text": "Xxxx",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 16,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "487",
+      "489"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "474",
+    "name": "Google Shape;474;p1",
+    "parentGroupId": null,
+    "top": 96.2444094488189,
+    "left": 590.23031496063,
+    "width": 165.804803149606,
+    "height": 0,
+    "text": "",
+    "type": "Line",
+    "altText": "",
+    "zIndex": 17,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "475"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "475",
+    "name": "Google Shape;475;p1",
+    "parentGroupId": null,
+    "top": 85.4063779527559,
+    "left": 625.915511811024,
+    "width": 94.4344094488189,
+    "height": 21.6759842519685,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 18,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "474"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 14,
+      "bold": false,
+      "italic": true
+    }
+  },
+  {
+    "id": "476",
+    "name": "Google Shape;476;p1",
+    "parentGroupId": null,
+    "top": 150.131732283465,
+    "left": 569.959212598425,
+    "width": 206.347007874016,
+    "height": 57.9715748031496,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 19,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 12,
+      "bold": true,
+      "italic": true
+    }
+  },
+  {
+    "id": "477",
+    "name": "Google Shape;477;p1",
+    "parentGroupId": null,
+    "top": 212.129921259843,
+    "left": 569.959212598425,
+    "width": 206.64,
+    "height": 259.960551181102,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 20,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 11,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "478",
+    "name": "Google Shape;478;p1",
+    "parentGroupId": null,
+    "top": 224.05062992126,
+    "left": 777.261102362205,
+    "width": 0,
+    "height": 252,
+    "text": "",
+    "type": "Line",
+    "altText": "",
+    "zIndex": 21,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "479",
+    "name": "Google Shape;479;p1",
+    "parentGroupId": null,
+    "top": 111.209527559055,
+    "left": 777.923070866142,
+    "width": 133.516535433071,
+    "height": 35.4525196850394,
+    "text": "Xxxx",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 22,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "489"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "480",
+    "name": "Google Shape;480;p1",
+    "parentGroupId": null,
+    "top": 96.2443307086614,
+    "left": 779.224645669291,
+    "width": 130.913385826772,
+    "height": 0,
+    "text": "",
+    "type": "Line",
+    "altText": "",
+    "zIndex": 23,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "483"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "481",
+    "name": "Google Shape;481;p1",
+    "parentGroupId": null,
+    "top": 150.131653543307,
+    "left": 777.923070866142,
+    "width": 133.516535433071,
+    "height": 57.9715748031496,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 24,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 12,
+      "bold": true,
+      "italic": true
+    }
+  },
+  {
+    "id": "482",
+    "name": "Google Shape;482;p1",
+    "parentGroupId": null,
+    "top": 212.13,
+    "left": 777.923070866142,
+    "width": 133.516535433071,
+    "height": 72,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 25,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 11,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "483",
+    "name": "Google Shape;483;p1",
+    "parentGroupId": null,
+    "top": 84.8526771653543,
+    "left": 814.145354330709,
+    "width": 61.072125984252,
+    "height": 21.6759842519685,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 26,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "480"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 14,
+      "bold": false,
+      "italic": true
+    }
+  },
+  {
+    "id": "486",
+    "name": "Google Shape;486;p1",
+    "parentGroupId": null,
+    "top": 102.181653543307,
+    "left": 97.5534645669291,
+    "width": 21.6,
+    "height": 21.6,
+    "text": "1",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 27,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "458",
+      "463"
+    ],
+    "font": {
+      "name": "",
+      "size": 0,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "487",
+    "name": "Google Shape;487;p1",
+    "parentGroupId": null,
+    "top": 102.181653543307,
+    "left": 562.044488188976,
+    "width": 21.6,
+    "height": 21.6,
+    "text": "3",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 28,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "468",
+      "473"
+    ],
+    "font": {
+      "name": "",
+      "size": 0,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "488",
+    "name": "Google Shape;488;p1",
+    "parentGroupId": null,
+    "top": 102.181653543307,
+    "left": 329.78968503937,
+    "width": 21.6,
+    "height": 21.6,
+    "text": "2",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 29,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "463",
+      "468"
+    ],
+    "font": {
+      "name": "",
+      "size": 0,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "489",
+    "name": "Google Shape;489;p1",
+    "parentGroupId": null,
+    "top": 102.181653543307,
+    "left": 771.06125984252,
+    "width": 21.6,
+    "height": 21.6,
+    "text": "4",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 30,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "473",
+      "479"
+    ],
+    "font": {
+      "name": "",
+      "size": 0,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "490",
+    "name": "Google Shape;490;p1",
+    "parentGroupId": null,
+    "top": 472.090551181102,
+    "left": 27.8431496062992,
+    "width": 72,
+    "height": 30.5350393700787,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 31,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 12,
+      "bold": true,
+      "italic": false
+    }
+  },
+  {
+    "id": "491",
+    "name": "Google Shape;491;p1",
+    "parentGroupId": null,
+    "top": 475.654409448819,
+    "left": 107.521417322835,
+    "width": 229.68,
+    "height": 28.0243307086614,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 32,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "467"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 11,
+      "bold": false,
+      "italic": true
+    }
+  },
+  {
+    "id": "492",
+    "name": "Google Shape;492;p1",
+    "parentGroupId": null,
+    "top": 475.654409448819,
+    "left": 338.818346456693,
+    "width": 437.487874015748,
+    "height": 28.0243307086614,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 33,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "462"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 11,
+      "bold": false,
+      "italic": true
+    }
+  },
+  {
+    "id": "493",
+    "name": "Google Shape;493;p1",
+    "parentGroupId": null,
+    "top": 475.654409448819,
+    "left": 777.923070866142,
+    "width": 133.2,
+    "height": 28.0243307086614,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 34,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 11,
+      "bold": false,
+      "italic": true
+    }
+  }
+]
