@@ -1,17 +1,8 @@
-import os
+# llmProvider.py
 import logging
-from langchain_google_genai import (
-    GoogleGenerativeAI,
-    GoogleGenerativeAIEmbeddings,
-    HarmBlockThreshold,
-    HarmCategory
-)
-from config.config import (
-    LLM_API_KEY,
-    GEMINI_FLASH_2_0_MODEL,
-    GEMINI_FLASH_2_0_MODEL_LITE,
-    GEMINI_EMBEDDINGS_MODEL
-)
+from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddings, HarmBlockThreshold, HarmCategory
+from config.config import LLM_API_KEY, GEMINI_FLASH_2_0_MODEL, GEMINI_EMBEDDINGS_MODEL, GEMINI_FLASH_2_0_MODEL_LITE
+import google.api_core.exceptions
 
 # Logging
 logging.basicConfig(level=logging.INFO)
@@ -43,16 +34,17 @@ def initialize_gemini_llm(model_name):
             logging.warning("API quota exhausted.")
         logging.error(f"Failed to initialize LLM {model_name}: {str(e)}")
         raise
-
+    
 def initialize_gemini_embeddings():
     try:
-        return GoogleGenerativeAIEmbeddings(
-            model=GEMINI_EMBEDDINGS_MODEL,
-            google_api_key=LLM_API_KEY
-        )
+        return GoogleGenerativeAIEmbeddings(model=GEMINI_EMBEDDINGS_MODEL, google_api_key=LLM_API_KEY)
+    except google.api_core.exceptions.ResourceExhausted:
+        logging.warning("API key limit exhausted for Gemini Embeddings. Please check your quota or use a different API key.")
+        raise 
+
     except Exception as e:
         logging.error(f"Failed to initialize embeddings: {str(e)}")
-        raise
+        raise 
 
 # === Client Instances ===
 gemini_flash_llm = initialize_gemini_llm(GEMINI_FLASH_2_0_MODEL)
