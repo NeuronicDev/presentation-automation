@@ -4,7 +4,7 @@ from io import BytesIO
 from pptx import Presentation
 from pptx.util import Pt, Inches
 from pptx.enum.text import PP_PARAGRAPH_ALIGNMENT, MSO_VERTICAL_ANCHOR, MSO_AUTO_SIZE
-from pptx.enum.shapes import MSO_SHAPE_TYPE
+from pptx.enum.shapes import MSO_SHAPE_TYPE, MSO_CONNECTOR_TYPE, MSO_AUTO_SHAPE_TYPE, PP_PLACEHOLDER_TYPE, PP_MEDIA_TYPE
 from pptx.dml.color import RGBColor
 from pptx.enum.dml import MSO_THEME_COLOR, MSO_LINE
 from pptx.oxml.xmlchemy import OxmlElement
@@ -402,7 +402,7 @@ function_map = {
     "set_table_border": set_table_border,
 }
 
-# List of available predefined functions with signatures and descriptions
+
 AVAILABLE_FUNCTIONS = [
     # Text formatting functions
     {
@@ -553,73 +553,75 @@ AVAILABLE_FUNCTIONS = [
 
 
 FUNCTION_MAPPING_PROMPT = """
-You are an AI assistant tasked with mapping PowerPoint modification tasks to predefined Python functions. 
-Given a task specification and a list of available functions, determine which function to call and extract the necessary arguments from the task's parameters.
+    
+    You are an AI assistant tasked with mapping PowerPoint modification tasks to predefined Python functions. 
+    Given a task specification and a list of available functions, determine which function to call and extract the necessary arguments from the task's parameters.
 
-## Available Functions:
-{functions_list}
+    ## Available Functions:
+    {functions_list}
 
-## Task Specification:
-{task_json}
+    ## Task Specification:
+    {task_json}
 
-## Instructions:
-1. Analyze the task's `action`, `task_description`, and `params` to determine the most appropriate function to call.
-2. Extract or transform values from the task's `params` to match the function's signature.
-3. If the task cannot be mapped to any function, return an empty JSON object (`{{}}`).
-4. If the task can be mapped, output a JSON object with:
-   - "function_name": the name of the function to call
-   - "arguments": a dictionary of argument names and their values
+    ## Instructions:
+    1. Analyze the task's `action`, `task_description`, and `params` to determine the most appropriate function to call.
+    2. Extract or transform values from the task's `params` to match the function's signature.
+    3. If the task cannot be mapped to any function, return an empty JSON object (`{{}}`).
+    4. If the task can be mapped, output a JSON object with:
+    - "function_name": the name of the function to call
+    - "arguments": a dictionary of argument names and their values
 
 
-## Examples:
-### Example 1:
-Task Specification:
-{{
-  "action": "change_font",
-  "task_description": "Change the font to Arial and size to 14pt",
-  "params": {{"font_name": "Arial", "font_size": 14}}
-}}
+    ## Examples:
+    ### Example 1:
+    Task Specification:
+    {{
+    "action": "change_font",
+    "task_description": "Change the font to Arial and size to 14pt",
+    "params": {{"font_name": "Arial", "font_size": 14}}
+    }}
 
-Output:
-{{
-  "function_name": "set_font",
-  "arguments": {{"font_name": "Arial", "font_size": 14}}
-}}
+    Output:
+    {{
+    "function_name": "set_font",
+    "arguments": {{"font_name": "Arial", "font_size": 14}}
+    }}
 
-### Example 2:
-Task Specification:
-{{
-  "action": "change_text_color",
-  "task_description": "Change the text color to orange",
-  "params": {{"color": "orange"}}
-}}
+    ### Example 2:
+    Task Specification:
+    {{
+    "action": "change_text_color",
+    "task_description": "Change the text color to orange",
+    "params": {{"color": "orange"}}
+    }}
 
-Output:
-{{
-  "function_name": "set_text_color",
-  "arguments": {{"color_rgb": [255, 165, 0]}}
-}}
+    Output:
+    {{
+    "function_name": "set_text_color",
+    "arguments": {{"color_rgb": [255, 165, 0]}}
+    }}
 
-### Example 3:
-Task Specification:
-{{
-  "action": "unknown_action",
-  "task_description": "Do something undefined",
-  "params": {{}}
-}}
+    ### Example 3:
+    Task Specification:
+    {{
+    "action": "unknown_action",
+    "task_description": "Do something undefined",
+    "params": {{}}
+    }}
 
-Output:
-{{}}
+    Output:
+    {{}}
 
-## CRITICAL INSTRUCTIONS:
-- Only map if the function perfectly matches the task's intent AND you can extract ALL necessary arguments from the input task's params.
-- Ensure argument types match the function signature and have the correct data type (string, int, float, boolean, list for RGB like [255, 255, 255] not colour name string) 
-- If a parameter is missing, use the function's default value if applicable.
-- For functions requiring a `shape` or `slide` argument, assume it will be provided separately and do not include it in the arguments.
-- If the task is too complex or requires logic not covered by a single function, return an empty JSON object (`{{}}`).
+    ## CRITICAL INSTRUCTIONS:
+    - Only map if the function perfectly matches the task's intent AND you can extract ALL necessary arguments from the input task's params.
+    - Ensure argument types match the function signature and have the correct data type (string, int, float, boolean, list for RGB like [255, 255, 255] not colour name string) 
+    - If a parameter is missing, use the function's default value if applicable.
+    - For functions requiring a `shape` or `slide` argument, assume it will be provided separately and do not include it in the arguments.
+    - If the task is too complex or requires logic not covered by a single function, return an empty JSON object (`{{}}`).
 
-Your response must be a valid JSON object.
-"""
+    Your response must be a valid JSON object.
+    
+    """
 
 def get_llm_mapped_function(task):
     functions_list = json.dumps(AVAILABLE_FUNCTIONS, indent=2)
@@ -647,112 +649,149 @@ def get_llm_mapped_function(task):
 
 
 def find_shape_by_hint(slide, hint):
+    logging.info(f"Finding shape with hint: {hint}")
     if not hint or not isinstance(hint, str) or not hint.strip():
-        return slide.shapes[0] if len(slide.shapes) > 0 else None
+        return None
     
     hint = hint.strip().lower()
-    
-    # Case 1: Shape by index (e.g., "shape:2")
+    potential_matches = []
+
+    # Case 1: Shape by explicit index (high confidence)
     shape_index_match = re.match(r'shape:(\d+)', hint)
     if shape_index_match:
         index = int(shape_index_match.group(1))
         if 0 <= index < len(slide.shapes):
+            logging.info(f"Found exact shape by index: {index}")
             return slide.shapes[index]
+        else:
+            logging.warning(f"Shape index {index} out of range (0-{len(slide.shapes)-1})")
+            return None
     
-    # Case 2: Placeholder by index (e.g., "placeholder:0")
+    # Case 2: Placeholder by explicit index (high confidence)
     placeholder_index_match = re.match(r'placeholder:(\d+)', hint)
     if placeholder_index_match:
         index = int(placeholder_index_match.group(1))
         for shape in slide.shapes:
             if hasattr(shape, 'is_placeholder') and shape.is_placeholder and shape.placeholder_format.idx == index:
+                logging.info(f"Found exact placeholder by index: {index}")
                 return shape
+        logging.warning(f"Placeholder with index {index} not found")
+        return None
     
-    # Case 3: Exact text match
+    # Case 3: Exact text match (high confidence)
+    exact_text_matches = []
     for shape in slide.shapes:
         if hasattr(shape, "text_frame") and shape.text_frame.text.strip().lower() == hint:
-            return shape
+            exact_text_matches.append(shape)
     
-    # Case 4: Common placeholders by name
+    if len(exact_text_matches) == 1:
+        logging.info(f"Found exact text match: {hint}")
+        return exact_text_matches[0]
+    elif len(exact_text_matches) > 1:
+        logging.warning(f"Multiple shapes with exact text match '{hint}', results ambiguous")
+        return None
+    
+    # Case 4: Common placeholders by specific name (high confidence)
     placeholder_mapping = {
         'title': 0,
         'subtitle': 1,
         'content': 2,
         'body': 2,
-        'text': 2,
         'footer': 15,
         'header': 16,
         'date': 17,
         'slide number': 18
     }
     
-    for keyword, idx in placeholder_mapping.items():
-        if keyword in hint:
-            for shape in slide.shapes:
-                if (hasattr(shape, 'is_placeholder') and 
-                    shape.is_placeholder and 
-                    shape.placeholder_format.idx == idx):
-                    return shape
+    # Only match if hint is exactly one of these placeholder names
+    if hint in placeholder_mapping:
+        idx = placeholder_mapping[hint]
+        for shape in slide.shapes:
+            if (hasattr(shape, 'is_placeholder') and 
+                shape.is_placeholder and 
+                shape.placeholder_format.idx == idx):
+                logging.info(f"Found exact placeholder match: {hint}")
+                return shape
+            
     
-    # Case 5: Shape type search
+    # Case 5: Shape type search when specified precisely (medium confidence)
     shape_type_hints = {
         'table': MSO_SHAPE_TYPE.TABLE,
         'chart': MSO_SHAPE_TYPE.CHART,
         'image': MSO_SHAPE_TYPE.PICTURE,
         'picture': MSO_SHAPE_TYPE.PICTURE,
-        'text box': MSO_SHAPE_TYPE.TEXT_BOX,
-        'text': MSO_SHAPE_TYPE.TEXT_BOX,
-        'textbox': MSO_SHAPE_TYPE.TEXT_BOX,
-        'group': MSO_SHAPE_TYPE.GROUP,
-        'line': MSO_SHAPE_TYPE.LINE
+        'text box': MSO_SHAPE_TYPE.TEXT_BOX
     }
+    # Only match if hint is exactly one of these shape types
+    if hint in shape_type_hints:
+        matching_shapes = []
+        for shape in slide.shapes:
+            if hasattr(shape, 'shape_type') and shape.shape_type == shape_type_hints[hint]:
+                matching_shapes.append(shape)
+        
+        if len(matching_shapes) == 1:
+            logging.info(f"Found single shape of type: {hint}")
+            return matching_shapes[0]
+        elif len(matching_shapes) > 1:
+            logging.warning(f"Multiple shapes of type '{hint}', results ambiguous")
+            return None
     
-    for type_hint, shape_type in shape_type_hints.items():
-        if type_hint in hint:
-            for shape in slide.shapes:
-                if hasattr(shape, 'shape_type') and shape.shape_type == shape_type:
-                    return shape
-    
-    # Case 6: Position-based search
+    # Case 6: Position-based search when position is specific (medium confidence)
     position_hints = {
-        'top left': (0, 0, 0.5, 0.5),
-        'top center': (0.25, 0, 0.75, 0.5),
-        'top right': (0.5, 0, 1, 0.5),
-        'middle left': (0, 0.25, 0.5, 0.75),
-        'center': (0.25, 0.25, 0.75, 0.75),
-        'middle right': (0.5, 0.25, 1, 0.75),
-        'bottom left': (0, 0.5, 0.5, 1),
-        'bottom center': (0.25, 0.5, 0.75, 1),
-        'bottom right': (0.5, 0.5, 1, 1)
+        'top left': (0, 0, 0.3, 0.3),
+        'top center': (0.35, 0, 0.65, 0.3),
+        'top right': (0.7, 0, 1, 0.3),
+        'middle left': (0, 0.35, 0.3, 0.65),
+        'center': (0.35, 0.35, 0.65, 0.65),
+        'middle right': (0.7, 0.35, 1, 0.65),
+        'bottom left': (0, 0.7, 0.3, 1),
+        'bottom center': (0.35, 0.7, 0.65, 1),
+        'bottom right': (0.7, 0.7, 1, 1)
     }
-    
-    for pos_hint, (left_ratio, top_ratio, right_ratio, bottom_ratio) in position_hints.items():
-        if pos_hint in hint:
-            slide_width = slide.width
-            slide_height = slide.height
+    if hint in position_hints:
+        left_ratio, top_ratio, right_ratio, bottom_ratio = position_hints[hint]
+        slide_width = slide.width
+        slide_height = slide.height
+        matching_shapes = []
+        
+        for shape in slide.shapes:
+            shape_left_ratio = shape.left / slide_width
+            shape_top_ratio = shape.top / slide_height
+            shape_right_ratio = (shape.left + shape.width) / slide_width
+            shape_bottom_ratio = (shape.top + shape.height) / slide_height
             
-            # Find shapes in this region
-            for shape in slide.shapes:
-                shape_left_ratio = shape.left / slide_width
-                shape_top_ratio = shape.top / slide_height
-                shape_right_ratio = (shape.left + shape.width) / slide_width
-                shape_bottom_ratio = (shape.top + shape.height) / slide_height
-                
-                # Check if shape is mostly in the target region
-                if (shape_left_ratio >= left_ratio and 
-                    shape_top_ratio >= top_ratio and 
-                    shape_right_ratio <= right_ratio and 
-                    shape_bottom_ratio <= bottom_ratio):
-                    return shape
-    
-    # Case 7: Partial text match
+            # Check if shape is mostly in the target region
+            if (shape_left_ratio >= left_ratio and 
+                shape_top_ratio >= top_ratio and 
+                shape_right_ratio <= right_ratio and 
+                shape_bottom_ratio <= bottom_ratio):
+                matching_shapes.append(shape)
+        
+        if len(matching_shapes) == 1:
+            logging.info(f"Found single shape in position: {hint}")
+            return matching_shapes[0]
+        elif len(matching_shapes) > 1:
+            logging.warning(f"Multiple shapes in position '{hint}', results ambiguous")
+            return None
+        
+    # Case 7: Partial text match (lower confidence) - we collect but don't immediately return
+    partial_matches = []
     for shape in slide.shapes:
         if hasattr(shape, "text_frame") and hint in shape.text_frame.text.lower():
-            return shape
+            partial_matches.append(shape)
     
-    # Fallback: Any text-containing shape
-    for shape in slide.shapes:
-        if hasattr(shape, "text_frame") and shape.text_frame.text.strip():
-            return shape
+    if len(partial_matches) == 1:
+        logging.info(f"Found single partial text match for: {hint}")
+        return partial_matches[0]
+    elif len(partial_matches) > 1:
+        logging.warning(f"Multiple shapes with partial text match '{hint}', results ambiguous")
+        return None
     
-    # Last resort: first shape
-    return slide.shapes[0] if len(slide.shapes) > 0 else None
+    # For generic hints that could refer to multiple elements, return None
+    generic_hints = ['text', 'content', 'shape', 'element', 'all', 'every']
+    if hint in generic_hints:
+        logging.warning(f"Generic hint '{hint}' could match multiple elements, cannot determine target with confidence")
+        return None
+    
+    logging.warning(f"Could not find shape matching hint '{hint}' with sufficient confidence")
+    return None

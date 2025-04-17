@@ -44,7 +44,7 @@ CODE_CORRECTION_PROMPT = """
     1.  **Understand the Task:** Review the task description to understand the original goal of the code.
     2.  **Analyze the Error Message:** Carefully examine the `error_message` to pinpoint the type of error (e.g., `AttributeError`, `TypeError`, `IndexError`, `ImportError`, syntax error) and the line of code where it occurred.
     3.  **Inspect the Failing Code:** Analyze the `failing_code` snippet, paying close attention to the line indicated in the error message and the surrounding code.
-    4.  **Identify the Root Cause:** Determine the reason for the error. Is it a typo, incorrect `python-pptx` library usage, missing import, logical error in the code, or an assumption about the PPT structure that is incorrect?
+    4.  **Identify the Root Cause:** Determine the reason for the error. Is it a typo, incorrect `python-pptx` library usage, missing or incorrect import, logical error in the code, or an assumption about the PPT structure that is incorrect?
     5.  **Generate Corrected Code:**  Modify the `failing_code` to fix the identified error and ensure it still performs the intended task as described in the `task_description`.
     6.  **Maintain Original Intent:** Ensure that the corrected code still aims to achieve the *original* task described in `task_description`. Do not change the overall goal, just fix the error.
     7.  **Output:** Provide **only** the corrected Python code snippet as text. Do not include any preamble, explanations, comments (unless essential for very complex fixes), or markdown formatting. JUST the corrected code.
@@ -53,13 +53,12 @@ CODE_CORRECTION_PROMPT = """
 
 
 def generate_code_with_retry(failing_code: str, error_message: str, agent_task_specification: Dict[str, Any]) -> Optional[str]:
-    logging.info(f"Attempting CODE CORRECTION for task: {agent_task_specification.get('action')} with error: {error_message}...")
+    logging.info(f"Attempting CODE CORRECTION for task: {agent_task_specification.get('action')} with failing code: {failing_code} and error: {error_message} ...")
     try:
         task_description = agent_task_specification.get("task_description")
         action = agent_task_specification.get("action")
         target_element_hint = agent_task_specification.get("target_element_hint")
         params = agent_task_specification.get("params", {})
-
 
         prompt_template = PromptTemplate.from_template(CODE_CORRECTION_PROMPT)
         prompt_input = {
@@ -74,7 +73,6 @@ def generate_code_with_retry(failing_code: str, error_message: str, agent_task_s
         try:
             response = chain.invoke(prompt_input)
             generated_code_str = response.strip()
-            # logging.info(f"Generated code:\n {generated_code_str}")
             code_block = re.search(r'```python\n(.*?)\n```', generated_code_str, re.DOTALL)
             
             if code_block:

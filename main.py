@@ -15,6 +15,7 @@ from code_manipulation.code_generator import generate_python_code
 from code_manipulation.code_executor import execute_code_in_docker
 from code_manipulation.xml_code_generator import generate_modified_xml_code
 from code_manipulation.xml_code_injector import inject_xml_into_ppt
+from code_manipulation.xml_code_corrector import correct_xml_code_with_llm, validate_xml_code
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -157,14 +158,15 @@ def process_with_python_pptx(pptx_path, base_filename_of_original_ppt, task_spec
 
 def process_with_xml(pptx_path, base_filename_of_original_ppt, task_specifications, slide_context_cache):
     logging.info("------------------- Starting XML-based processing as fallback -------------------")
-    
+
     execution_report = {
         "status": "unknown", 
         "errors": [], 
         "processed_count": 0, 
         "success_count": 0
     }
-    
+
+    temp_dir = None
     try:
         temp_dir = tempfile.mkdtemp(prefix="ppt_xml_")
         working_pptx_path = os.path.join(temp_dir, "working_copy.pptx")
@@ -196,46 +198,96 @@ def process_with_xml(pptx_path, base_filename_of_original_ppt, task_specificatio
             
             # Apply each task sequentially
             for i, task in enumerate(tasks):
+                XML_MAX_RETRIES = 3
                 task_desc = task.get("task_description", f"Task #{i+1}")
                 logging.info(f"Applying task {i+1}/{len(tasks)} for slide {slide_number}: {task_desc}")
-                
-                modified_xml = generate_modified_xml_code(
-                    original_xml=current_xml,
-                    agent_task_specification=task,
-                    slide_context=slide_context
-                )
-                
                 execution_report["processed_count"] += 1
+
+                task_success = False
                 
-                if not modified_xml:
-                    logging.error(f"Failed to generate modified XML for task: {task_desc}")
-                    execution_report["errors"].append({
-                        "task_index": execution_report["processed_count"] - 1,
-                        "error": "Failed to generate modified XML",
-                        "description": task_desc
-                    })
-                    continue
+                for retry_count in range(XML_MAX_RETRIES):
+                    try:
+                        logging.info(f"Attempt {retry_count+1}/{XML_MAX_RETRIES} for task: {task_desc}")
+                        
+                        # Step 1: Generate modified XML
+                        modified_xml = generate_modified_xml_code(
+                            original_xml=current_xml, 
+                            agent_task_specification=task, 
+                            slide_context=slide_context
+                        )
+                        
+                        if not modified_xml:
+                            logging.error(f"Attempt {retry_count+1}: Failed to generate XML")
+                            if retry_count == XML_MAX_RETRIES - 1:
+                                execution_report["errors"].append({
+                                    "task_index": execution_report["processed_count"] - 1,
+                                    "error": "XML generation failed after all retries",
+                                    "description": task_desc
+                                })
+                            continue  # Try next attempt with fresh generation
+                        
+                        # Step 2: Validate the XML
+                        is_valid, validation_msg = validate_xml_code(modified_xml, task, slide_context)
+                        
+                        # Step 3: If invalid, try correction (but not on final attempt)
+                        if not is_valid:
+                            logging.warning(f"Attempt {retry_count+1}: Validation failed: {validation_msg}")
+                            
+                            if retry_count < XML_MAX_RETRIES - 1:
+                                logging.info(f"Attempt {retry_count+1}: Trying LLM correction")
+                                corrected_xml = correct_xml_code_with_llm(modified_xml, task_desc, validation_msg)
+                                
+                                if corrected_xml:
+                                    is_valid, corrected_validation_msg = validate_xml_code(corrected_xml, task, slide_context)
+                                    if is_valid:
+                                        logging.info(f"Attempt {retry_count+1}: LLM correction successful")
+                                        modified_xml = corrected_xml
+                                    else:
+                                        logging.warning(f"Attempt {retry_count+1}: LLM correction failed: {corrected_validation_msg}")
+                                        continue  # Try next attempt with fresh generation
+                                else:
+                                    logging.warning(f"Attempt {retry_count+1}: LLM provided no correction")
+                                    continue  
+                            else:
+                                execution_report["errors"].append({
+                                    "task_index": execution_report["processed_count"] - 1,
+                                    "error": f"Validation failed after all retries: {validation_msg}",
+                                    "description": task_desc
+                                })
+                                break
+                        
+                        # Step 4: If we have valid XML, try to inject it
+                        if is_valid:
+                            success = inject_xml_into_ppt(working_pptx_path, slide_number, modified_xml)
+                            
+                            if success:
+                                current_xml = modified_xml
+                                execution_report["success_count"] += 1
+                                logging.info(f"Task {task_desc} applied successfully")
+                                task_success = True
+                                break  
+                            else:
+                                logging.error(f"Attempt {retry_count+1}: XML injection failed")
+                                if retry_count == XML_MAX_RETRIES - 1:
+                                    execution_report["errors"].append({
+                                        "task_index": execution_report["processed_count"] - 1,
+                                        "error": "XML injection failed after all retries",
+                                        "description": task_desc
+                                    })
                     
-                if modified_xml == current_xml:
-                    logging.warning(f"No XML changes made for task: {task_desc}")
-                    execution_report["success_count"] += 1
-                    continue
+                    except Exception as e:
+                        logging.error(f"Attempt {retry_count+1}: Exception: {str(e)}", exc_info=True)
+                        if retry_count == XML_MAX_RETRIES - 1:
+                            execution_report["errors"].append({
+                                "task_index": execution_report["processed_count"] - 1,
+                                "error": f"Exception during processing: {str(e)}",
+                                "description": task_desc
+                            })
                 
-                current_xml = modified_xml
-                
-                success = inject_xml_into_ppt(working_pptx_path, slide_number, modified_xml)
-                
-                if success:
-                    logging.info(f"Successfully applied XML changes for task: {task_desc}")
-                    execution_report["success_count"] += 1
-                else:
-                    logging.error(f"Failed to inject modified XML for task: {task_desc}")
-                    execution_report["errors"].append({
-                        "task_index": execution_report["processed_count"] - 1,
-                        "error": "Failed to inject modified XML",
-                        "description": task_desc
-                    })
+                if not task_success:
+                    logging.warning(f"Task failed after {XML_MAX_RETRIES} attempts: {task_desc}")
         
+        # Create output directory and save final result
         final_output_filename = f"{base_filename_of_original_ppt}_xml_modified.pptx"
         output_dir = os.path.abspath("./output_ppts/pptx")
         os.makedirs(output_dir, exist_ok=True)
@@ -243,9 +295,8 @@ def process_with_xml(pptx_path, base_filename_of_original_ppt, task_specificatio
         
         shutil.copy2(working_pptx_path, final_output_path)
         logging.info(f"Final modified presentation saved to: {final_output_path}")
-
-        shutil.rmtree(temp_dir)
         
+        # Set final status
         if execution_report["success_count"] == execution_report["processed_count"]:
             execution_report["status"] = "success"
         elif execution_report["success_count"] > 0:
@@ -266,7 +317,16 @@ def process_with_xml(pptx_path, base_filename_of_original_ppt, task_specificatio
         })
         return False, None, execution_report
 
-
+    finally:
+        if temp_dir and os.path.exists(temp_dir):
+            try:
+                shutil.rmtree(temp_dir)
+            except Exception as e:
+                logging.warning(f"Failed to clean up temporary directory: {e}")      
+            
+            
+            
+            
 def main(original_pptx_path, email_path="path/to/email.txt"):
     overall_pipeline_status = "unknown"
     
@@ -458,6 +518,7 @@ def main(original_pptx_path, email_path="path/to/email.txt"):
                         }
                         return final_output_path, final_report
             
+            
             # Step 6: Fallback to XML approach if python-pptx failed or had low success rate
             logging.info("Falling back to XML approach...")
             xml_success, xml_output_path, xml_report = process_with_xml(
@@ -590,14 +651,27 @@ def main(original_pptx_path, email_path="path/to/email.txt"):
 if __name__ == "__main__":
     # original_pptx_path = os.path.abspath("./input_ppts/pptx/font_test_pfunc.pptx")
     # original_pptx_path = os.path.abspath("./input_ppts/pptx/font_test1.pptx")
-    original_pptx_path = os.path.abspath("./input_ppts/pptx/font_test2.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/font_test1_footer.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/font_test2.pptx")
     # original_pptx_path = os.path.abspath("./input_ppts/pptx/cleanup_test.pptx")
     # original_pptx_path = os.path.abspath("./input_ppts/pptx/cleanup_test2.pptx")
     # original_pptx_path = os.path.abspath("./input_ppts/pptx/table_alignment_test.pptx")
     # original_pptx_path = os.path.abspath("./input_ppts/pptx/table_alignment_test2.pptx")
-    # original_pptx_path = os.path.abspath("./input_ppts/pptx/consistent.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/consistent2.pptx")
     # original_pptx_path = os.path.abspath("./input_ppts/pptx/consistent3.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/timeline.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/cleanup_centre.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/format_eg_demo.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/format_boxes_end.pptx")
+    
 
+    original_pptx_path = os.path.abspath("./input_ppts/pptx/font_test1.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/font_test1_footer.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/font_test2.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/cleanup_test.pptx")
+    # original_pptx_path = os.path.abspath("./input_ppts/pptx/consistent2.pptx")
+
+    
     logging.info(f"Input PPTX: {original_pptx_path}")
     output_path, report = main(original_pptx_path)
     

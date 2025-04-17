@@ -12,6 +12,7 @@ from google import genai
 client = genai.Client(api_key=LLM_API_KEY)
 
 XML_MODIFICATION_PROMPT = """
+
     # State-of-the-Art PowerPoint XML Modification Expert 
 
     You are a **world-leading AI expert in PowerPoint Open XML Presentation Language (PPTX XML)**, possessing unparalleled expertise in directly manipulating PPTX XML to achieve complex and varied presentation modifications.
@@ -78,6 +79,8 @@ XML_MODIFICATION_PROMPT = """
     *   **Test Incrementally:**  For complex tasks, break down XML modifications into smaller steps and test incrementally to avoid introducing errors.
     *   **Validation is Key:** After any XML modification, always validate the PPTX file to ensure it is still valid and opens correctly in PowerPoint.
     
+    "CRITICAL: You MUST include ALL original, unmodified elements from the input <p:spTree>...</p:spTree> unless the task explicitly requires deleting them. Only modify or add elements relevant to the task. DO NOT return only the modified parts; return the complete, modified <p:sld>...</p:sld> structure."
+    
     ## OUTPUT REQUIREMENTS:
     Provide **only** the complete, modified XML code for the entire slide as text, enclosed in a ```xml code block. Ensure the XML is well-formed and valid.
     Do not include any preamble, explanations, step-by-step instructions, or markdown formatting outside the XML code block. 
@@ -92,6 +95,7 @@ XML_MODIFICATION_PROMPT = """
 def generate_modified_xml_code(original_xml: str, agent_task_specification: Dict[str, Any], slide_context: Dict[str, Any]) -> Optional[str]:
     try:
         logging.info(f"Generating modified XML code...")
+        logging.info(f"Original XML: {original_xml[:100]}")
         agent_name = agent_task_specification.get("agent_name")
         slide_number = agent_task_specification.get("slide_number")
         original_instruction = agent_task_specification.get("original_instruction")
@@ -114,7 +118,6 @@ def generate_modified_xml_code(original_xml: str, agent_task_specification: Dict
             slide_xml_structure=original_xml
         )
         
-        
         final_prompt = [main_prompt]
         slide_image_text_prompt = "The below is visual representation of the slide image. Use it to understand and visualize the current layout, structure, elements, spacing, overlaps, colors, and styles."
         final_prompt.append(slide_image_text_prompt)
@@ -132,7 +135,7 @@ def generate_modified_xml_code(original_xml: str, agent_task_specification: Dict
                 else:
                     logging.warning("Modified XML doesn't start with XML declaration. This might not be valid XML.")
                     
-            logging.info(f"Successfully generated modified XML for task: {modified_xml_str}")
+            # logging.info(f"Successfully generated modified XML for task: {modified_xml_str}")
             return modified_xml_str
         
         except Exception as e:

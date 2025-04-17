@@ -56,6 +56,7 @@ CODE_GENERATION_PROMPT = """
     - Basic shapes (AutoShapes, TextBoxes) often have direct `.fill` and `.line` attributes.
     - Container shapes like `GraphicFrame` (MSO_SHAPE_TYPE.GRAPHIC_FRAME, which holds Tables, Charts, SmartArt) DO NOT have a direct `.fill`. You must access the object inside (e.g., `shape.table`, `shape.chart`) and format its components (cells, plot area).
     - **ALWAYS check `shape.shape_type` or use `hasattr(shape, 'fill')` before attempting to access attributes like `.fill` or `.line` to avoid AttributeErrors.**
+    - There will be no external images/icons you should add while creating the code. You should only use the images/icons that are already present in the slide or create new basic shapes/icons internally.
 
     3. **Text Operations:**
     - Text frame access: `shape.text_frame.text = "New text"`
@@ -77,6 +78,7 @@ CODE_GENERATION_PROMPT = """
     - RGB colors: `RGBColor(r, g, b)` where r,g,b are 0-255
     - Theme colors: `MSO_THEME_COLOR.ACCENT_1`
     - Shape fill: `shape.fill.solid()`, `shape.fill.fore_color.rgb = RGBColor(r,g,b)`
+    - When writing code directly use rgb values instead of theme colors/ hex codes to avoid errors.
     
     6. **Positioning Relative to Table Cells:**
     - Individual table cells (`table.cell(r, c)`) DO NOT have `.left` or `.top` attributes.
@@ -95,6 +97,17 @@ CODE_GENERATION_PROMPT = """
     - Use relative positioning rather than hardcoded coordinates
     - Preserve existing content unless explicitly told to modify
 
+    8. **VERIFIED IMPORTS & ENUMS - USE ONLY THESE:**    
+        from pptx.util import Inches, Pt, Emu, Cm
+        from pptx.dml.color import RGBColor
+        from pptx.enum.text import MSO_AUTO_SIZE, MSO_VERTICAL_ANCHOR, PP_PARAGRAPH_ALIGNMENT, MSO_TEXT_UNDERLINE_TYPE
+        from pptx.enum.shapes import MSO_SHAPE_TYPE, MSO_CONNECTOR_TYPE, MSO_AUTO_SHAPE_TYPE, PP_PLACEHOLDER_TYPE, PP_MEDIA_TYPE
+        from pptx.enum.dml import MSO_FILL_TYPE, MSO_LINE_DASH_STYLE, MSO_COLOR_TYPE, MSO_PATTERN_TYPE, MSO_THEME_COLOR_INDEX
+        from pptx.chart.data import CategoryChartData, ChartData, XyChartData, BubbleChartData
+        from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION, XL_TICK_MARK, XL_TICK_LABEL_POSITION, XL_MARKER_STYLE, XL_DATA_LABEL_POSITION
+        from pptx.enum.action import PP_ACTION_TYPE
+        from pptx.table import Table, _Cell 
+    
 
     **Common Tasks:**
         *   **Text:** Access `shape.text_frame`, `tf.paragraphs`, `p.runs`, `run.font` (use `run.font.name`, `.size = Pt(...)`, `.bold = True`, `.color.rgb = RGBColor(...)`), `p.alignment = PP_ALIGN...`. Check `shape.has_text_frame` first.
@@ -113,6 +126,25 @@ CODE_GENERATION_PROMPT = """
     - **Tables & Matrices**: Standardize cell sizes and ensure consistent borders using line properties.
     - **Comparison Layouts**: Maintain visual balance between compared elements with equal sizing.
     
+    
+    ## CRITICAL REQUIREMENTS:
+    - ONLY use documented public methods and attributes from python-pptx (NEVER use internal methods that start with underscore "_" except for deletion operations where specifically mentioned)
+    - NEVER invent or use non-existent methods, attributes, or enums 
+    - ALWAYS use proper data types (integers for indices, strings for text, etc.)
+    - ALWAYS verify your imports are correct and reflect actual python-pptx modules
+    - ENSURE all enum values used are valid members of their respective enum classes
+    
+    ## COMMON MISTAKES TO AVOID:
+    - DO NOT use non-existent methods like `shape.get_text()` or `slide.align_shapes()`
+    - DO NOT use internal methods that start with underscore (e.g., `._element`) except for deletion
+    - DO NOT invent new enums or use incorrect enum values
+    - DO NOT use theme colors without verifying they exist; prefer RGBColor values
+    - DO NOT mix up coordinate units (use Inches/Pt/Cm consistently)
+    - DO NOT use string indices for accessing elements in collections
+    - DO NOT assume table cells have direct position attributes
+    - DO NOT forget proper type conversions (e.g., `int()` for indices)
+    - DO NOT use variables before defining them
+
     
     ## OUTPUT FORMAT:
     Provide ONLY executable Python code without explanations, preamble, or markdown formatting. JUST the code.
@@ -153,12 +185,11 @@ def generate_python_code(agent_task_specification: Dict[str, Any], slide_context
         try:
             response = client.models.generate_content(model="gemini-2.0-flash", contents=[final_prompt, image])
             generated_code_str = response.text.strip()
-            # logging.info(f"Generated code:\n {generated_code_str}")
             code_block = re.search(r'```python\n(.*?)\n```', generated_code_str, re.DOTALL)
             
             if code_block:
                 extracted_code = code_block.group(1)
-                logging.info(f"EXTRACTED CODE:\n {extracted_code}")
+                logging.info(f"GENERATED CODE:\n {extracted_code}")
                 return extracted_code
             else:
                 logging.info(f"No markdown code block found. Using entire string.")

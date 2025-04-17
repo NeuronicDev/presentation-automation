@@ -11,13 +11,11 @@ from config.config import LIBREOFFICE_PATH
 
 
 def convert_pptx_to_pdf(pptx_path, output_dir):
-    
     pptx_path = os.path.abspath(pptx_path)
     filename = os.path.basename(pptx_path)
     filename_without_ext = os.path.splitext(filename)[0]
     
     os.makedirs(output_dir, exist_ok=True)
-    
     output_pdf = os.path.join(output_dir, f"{filename_without_ext}.pdf")
     
     try:
@@ -70,13 +68,11 @@ def extract_slide_xml_from_ppt(pptx_path, slide_number):
     try:
         slide_filename = f"ppt/slides/slide{slide_number}.xml"
         with zipfile.ZipFile(pptx_path, 'r') as zip_ref:
-
             if slide_filename not in zip_ref.namelist():
                 logging.error(f"Could not find slide {slide_number} XML in {pptx_path}")
                 return None
             
             xml_content = zip_ref.read(slide_filename)
-            
             dom = xml.dom.minidom.parseString(xml_content)
             pretty_xml = dom.toprettyxml()
             
@@ -93,7 +89,7 @@ def extract_slide_xml(prs, slide_index):
         slide = prs.slides[slide_index]
         slide_element = slide._element
         xml = etree.tostring(slide_element, encoding='unicode', pretty_print=True, method='xml')
-        logging.info(f"Successfully extracted XML for slide index {slide_index}: {xml}")
+        logging.info(f"Successfully extracted XML for slide index {slide_index}")
         return xml
     except Exception as e:
         logging.error(f"Error extracting XML for slide index {slide_index}: {e}")
@@ -146,14 +142,11 @@ def generate_slide_context(prs, slide_number, pdf_path, image_cache):
 
 def update_slide_context_cache(pptx_path, pdf_path, slide_context_cache, image_cache):
     try:
-        # Convert the modified PPTX to PDF
         output_dir = os.path.dirname(pdf_path)
         new_pdf_path = convert_pptx_to_pdf(pptx_path, output_dir=output_dir)
         
-        # Load the modified presentation
         prs = pptx.Presentation(pptx_path)
         
-        # Clear existing caches
         image_cache.clear()
         
         # Regenerate context for all existing slides

@@ -12,14 +12,6 @@ from google import genai
 client = genai.Client(api_key=LLM_API_KEY)
 
 
-def pptx_to_images(pptx_path, output_dir):
-    pdf_path = convert_pptx_to_pdf(pptx_path, output_dir)
-    images = convert_from_path(pdf_path, dpi=300)
-    if not images:
-        raise RuntimeError(f"No images generated from PDF {pdf_path}")
-    logging.info(f"Successfully converted {len(images)} slides to images")
-    return images
-
 VALIDATION_PROMPT = """
     # ROLE: AI PowerPoint Quality Assurance Analyst (Visual & Task Validation)
 
@@ -63,6 +55,16 @@ VALIDATION_PROMPT = """
 """
 
     
+
+def pptx_to_images(pptx_path, output_dir):
+    pdf_path = convert_pptx_to_pdf(pptx_path, output_dir)
+    images = convert_from_path(pdf_path, dpi=300)
+    if not images:
+        raise RuntimeError(f"No images generated from PDF {pdf_path}")
+    logging.info(f"Successfully converted {len(images)} slides to images")
+    return images
+
+
 def validate_presentation(original_pptx_path, modified_pptx_path, task_specifications):
     logging.info(f"Starting validation of modified presentation {modified_pptx_path}...")
     validation_report = {"issues_found": [], "success": True, "task_assessments": [], "validation_success_percentage": 0 }
