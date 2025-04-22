@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>PowerPoint Automation</title>
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <!-- For more information on Fluent UI, visit https://developer.microsoft.com/fluentui#/. -->
+    <link rel="stylesheet" href="https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/office-ui-fabric-core/11.1.0/css/fabric.min.css"/>
+    <!-- Template styles -->
+    <link href="taskpane.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="app-body">
+    <label for="instructionInput">Enter Instruction:</label>
+    <input id="instructionInput" type="text" placeholder="Enter your instruction" />
+    <button id="runButton">Run</button>
+  </div>
+  <script src="utils/pptxToBase64Json.js"></script>
+  <script src="utils/extract_slide_number&Index.js"></script>
+  <script src="taskpane.js"></script>
+  <script src="utils/extractShapeMetadata.js"></script>
+</body>
+</html>

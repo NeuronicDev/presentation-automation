@@ -1,0 +1,14 @@
+[
+    {
+        "agent_name": "formatting",
+        "slide_number": 1,
+        "original_instruction": "fit all the similar shapes with same width and height",
+        "task_description": "To fit all the similar shapes with the same width and height as requested, resize the four rectangular shapes (id=458, id=459, id=460 and id=490) located in the middle section of the slide to have the same height and width. Use the average width and height from these shapes as the standard dimensions. Specifically, set the width and height of each of these rectangular shapes to be identical based on the average. This should ensure visual consistency among these related elements.",
+        "action": "resize_elements",
+        "target_element_hint": "all the similar shapes",
+        "params": {
+            "width": "same",
+            "height": "same"
+        }
+    }
+]
