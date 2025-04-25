@@ -225,7 +225,7 @@ def formatting_agent(classified_instruction: Dict[str, Any], slide_context: Dict
             }
             processed_subtasks.append(flattened_task)
 
-    logging.info(f"Processed subtasks for formatting final: {processed_subtasks}")
+    # logging.info(f"Processed subtasks for formatting final: {processed_subtasks}")
     return processed_subtasks
 
 

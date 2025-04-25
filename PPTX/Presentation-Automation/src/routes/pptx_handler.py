@@ -1,59 +1,7 @@
-# # pptx_handler.py 
-# from fastapi import APIRouter, HTTPException, Body, status
-# from pydantic import BaseModel, Field
-# import base64
-# import os
-# import aiofiles
-# import logging
-
-# router = APIRouter()
-
-# # --- Configuration ---
-# SAVE_DIR = "./uploaded_pptx"
-# os.makedirs(SAVE_DIR, exist_ok=True)
-
-# # --- Pydantic Model for Request Body ---
-# class PPTXPayload(BaseModel):
-#     base64: str = Field(..., description="Base64 encoded content of the PPTX file")
-#     filename: str = "presentation.pptx"
-
-# # --- Logging Setup ---
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# logger = logging.getLogger(__name__)
-
-# # --- PPTX Upload and Conversion Endpoint ---
-# @router.post("", status_code=status.HTTP_200_OK, response_model=dict)
-# async def upload_pptx(payload: PPTXPayload = Body(...)):
-#     """
-#     Receives a Base64 encoded PPTX file, saves it, converts it to slide
-#     """
-#     try:
-#         safe_filename = os.path.basename(payload.filename)
-#         pptx_path = os.path.join(SAVE_DIR, safe_filename)
-#         pptx_bytes = base64.b64decode(payload.base64)
-
-#         async with aiofiles.open(pptx_path, "wb") as f:
-#             await f.write(pptx_bytes)
-
-#         logger.info(f"PPTX file saved at {pptx_path}")
-#         return { "status": "success", "message": f"File saved as {safe_filename}" }
-
-#     except base64.binascii.Error as e:
-#         logger.error("Base64 decoding error", exc_info=True)
-#         raise HTTPException(status_code=400, detail="Invalid Base64 data")
-#     except Exception as e:
-#         logger.error("Unexpected error while saving PPTX", exc_info=True)
-#         raise HTTPException(status_code=500, detail=f"Server error: {e}")
-
-
 from fastapi import APIRouter, HTTPException, Body, status
 from pydantic import BaseModel, Field
-import base64
-import os
-import aiofiles
-import logging
+import base64, os, shutil, aiofiles, logging
 from pptx import Presentation
-
 from utils.utils import convert_pptx_to_pdf, generate_slide_context
 
 router = APIRouter()
@@ -72,6 +20,28 @@ class PPTXPayload(BaseModel):
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# --- Helper Functions ---
+def clear_directory_contents(directory_path: str):
+    """Removes all files and subdirectories within the specified directory."""
+    if not os.path.isdir(directory_path):
+        logger.info(f"Directory {directory_path} does not exist, nothing to clear.")
+        return
+    logger.info(f"Clearing contents of directory: {directory_path}")
+    for filename in os.listdir(directory_path):
+        file_path = os.path.join(directory_path, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+                logger.debug(f"Deleted file: {file_path}")
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+                logger.debug(f"Deleted directory: {file_path}")
+        except Exception as e:
+            logger.error(f"Failed to delete {file_path}. Reason: {e}")
+
+# Flag to clear the metadata directory only once per session
+cleared_once = False
+
 # --- Upload + Process Route ---
 @router.post("", status_code=status.HTTP_200_OK, response_model=dict)
 async def upload_pptx(payload: PPTXPayload = Body(...)):
@@ -81,14 +51,18 @@ async def upload_pptx(payload: PPTXPayload = Body(...)):
     - Generates slide image + XML for each slide
     - Saves image bytes in a .txt file for each slide
     """
+    global cleared_once
     try:
+        # Save incoming PPTX
         safe_filename = os.path.basename(payload.filename)
+        if not safe_filename.lower().endswith(".pptx"):
+             raise HTTPException(status_code=400, detail="Invalid file type. Only .pptx supported.")
         pptx_path = os.path.join(SAVE_DIR, safe_filename)
         pptx_bytes = base64.b64decode(payload.base64)
 
         async with aiofiles.open(pptx_path, "wb") as f:
             await f.write(pptx_bytes)
-        logger.info(f"PPTX file saved at {pptx_path}")
+        logger.info(f"PPTX file saved temporarily at {pptx_path}")
 
         # Prepare output folder
         pptx_name = os.path.splitext(safe_filename)[0]
@@ -96,15 +70,20 @@ async def upload_pptx(payload: PPTXPayload = Body(...)):
         pdf_output_dir = os.path.join(slide_dir, "converted_pdfs")
         os.makedirs(pdf_output_dir, exist_ok=True)
 
-        # Step 1: Convert to PDF
+        logger.info(f"Attempting to clear contents of specific slide directory: {slide_dir}")
+        clear_directory_contents(slide_dir)
+        os.makedirs(pdf_output_dir, exist_ok=True)
+        logger.info(f"Cleared and ensured directories exist for: {slide_dir}")
+
+        # Step 2: Convert to PDF
         pdf_path = convert_pptx_to_pdf(pptx_path, output_dir=pdf_output_dir)
 
-        # Step 2: Load presentation
+        # Step 3: Load presentation
         prs = Presentation(pptx_path)
 
-        # Step 3: Generate context for each slide
+        # Step 4: Generate context for each slide
         for idx, _ in enumerate(prs.slides):
-            slide_number = idx + 1
+            slide_number = idx
             logger.info(f"Processing slide {slide_number}...")
             generate_slide_context(prs, slide_number, pdf_path, slide_dir)
 
@@ -123,4 +102,3 @@ async def upload_pptx(payload: PPTXPayload = Body(...)):
     except Exception as e:
         logger.error("Unexpected error while saving or processing PPTX", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Server error: {e}")
-

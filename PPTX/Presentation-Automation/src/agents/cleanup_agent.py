@@ -10,7 +10,7 @@ CLEANUP_TASK_DESCRIPTION_PROMPT  = """
     You are an expert AI assistant acting as a bridge between a parsed user request and a PowerPoint code generator. 
     Your task is to generate a clear, detailed natural language description for cleanup changes and tasks based on the given instruction and slide context that needs to be performed on a PowerPoint slide. 
     This description will guide the subsequent code generation step.
-    
+
     **Input:**
     Original User instruction: {original_instruction}
     Slide Number: {slide_number}
@@ -19,20 +19,32 @@ CLEANUP_TASK_DESCRIPTION_PROMPT  = """
     params: {params}
     Slide XML Structure: {slide_xml_structure}
     
-    
     **## Your Task (Conditional):**
 
-    1.  **Analyze Input:** Examine the provided `action`, `target_element_hint`, and `params`.
-    2.  **Determine Specificity:**
-        *   **IF** the `action` is specific (e.g., 'remove_elements', 'delete_shape', 'consolidate_text', 'reduce_content') and the `target_element_hint` clearly defines a single modification:
+    1.  **Analyze Input Task:** Examine the initial classified task details (`action`, `target_element_hint`, `params`) derived from the `original_instruction`. Understand the user's primary cleanup goal as classified.
+
+    2.  **Analyze Slide Context (If Necessary):**
+        *   **IF** the input `action` is general (e.g., 'general_slide_cleanup', 'adjust_layout', 'standardize_spacing') OR the `target_element_hint` is vague (e.g., null, "the shapes", "text boxes") OR the original instruction was broad ("cleanup"):
+            *   Meticulously examine the `slide_image_base64` and `slide_xml_structure`.
+            *   **Identify specific layout problems** relevant to a 'cleanup' task, focusing on:
+                *   **Overflow:** Any element exceeding slide bounds (960x540).
+                *   **Inconsistencies:** Significant differences (>5px) in `width`/`height` among visually similar shapes in rows/columns; uneven spacing or misalignments (>5px) in rows/columns.
+                *   **Clutter/Redundancy:** Elements that appear unnecessary, disconnected, overlapping badly, or duplicated without clear purpose.
+            *   This context analysis provides the concrete issues to address.
+        *   **ELSE (IF the input `action` and `target_element_hint` are already specific):** The context analysis is primarily for confirming the target elements and understanding their current state (e.g., getting current dimensions before suggesting a resize).
+
+    3.  **Generate Output Tasks:**
+        *   **IF** the input task analysis (Step 1) determined the request was already specific and actionable (e.g., "center title", "consolidate_text"):
             *   Generate a detailed natural language description explaining WHAT cleanup change to make, WHERE it applies (using hints/context), and HOW (using params), relating it to the original request.
             *   Output ONLY this description in the specified JSON format below (Output A).
-        *   **ELSE IF** the `action` is general/vague (e.g., 'cleanup_slide', 'remove_clutter', 'simplify') OR the original instruction is broad ("Clean this up", "Remove unnecessary elements", "Make slide cleaner"):
-            *   Analyze the slide's current state using the provided Image and XML context.
-            *   Identify specific cleanup improvements needed based on standard design principles (e.g., removing redundant elements, consolidating text, simplifying complex graphics, removing distracting elements).
-            *   Generate a list of concrete, actionable sub-tasks required to clean up the slide according to these principles. Use standard action verbs (e.g., 'remove_elements', 'delete_shape', 'consolidate_text', 'reduce_content', 'remove_duplicates').
+        *   **ELSE IF** the `action` is general/vague (e.g., 'cleanup_slide', 'simplify') OR the original instruction is broad ("Clean this up", "Make slide cleaner"):
+            *   Generate a **list** of concrete sub-tasks (`expanded_tasks`), where each sub-task addresses **one** specific issue identified in the context analysis (Overflow, Dimension Inconsistency, Alignment/Spacing, Redundancy).
+            *   Assign appropriate specific `action` verbs to each sub-task (e.g., `resize_shape`, `standardize_dimensions`, `align_elements`, `distribute_elements`, `remove_elements`, `flag_placeholder_text`).
+            *   Write a clear `task_description` for each sub-task, referencing WHAT and specific parameters (e.g., target dimensions, alignment type, spacing value).
+            *   **Prioritize:** Address overflow issues first, then major inconsistencies.
+            *   **Overflow Handling:** If resizing multiple similar shapes for overflow, ensure the task description specifies resizing them to a *consistent* smaller size.
             *   Output ONLY this list of sub-tasks in the specified JSON format below (Output B).
-
+            
     **You are provided with:**
     1.  **Original User instruction:** The high-level feedback instruction provided by the user.
     2.  **Slide Number:** The target slide for the modification.
@@ -44,7 +56,6 @@ CLEANUP_TASK_DESCRIPTION_PROMPT  = """
         *   `slide_xml_structure`: A representation of the slide's current XML structure.
         *   `slide_image_base64`: A base64 encoded image representing the slide's current visual appearance.
 
-
     **Your Goal:**
     Generate a detailed, unambiguous natural language description of the cleanup changes. Explain precisely:
     *   **EXISTS** in the current state of the slide.
@@ -52,7 +63,6 @@ CLEANUP_TASK_DESCRIPTION_PROMPT  = """
     *   **WHERE** it applies.
     *   **HOW and ON WHICH ELEMENTS** it should the changes be done such that origial user instruction is met.
     *   Relate it back to the **Original User instruction and Slide Image** for context.
-
 
     **## Output Requirements:**
     Respond ONLY with a single, valid JSON object in ONE of the following formats:
@@ -224,5 +234,4 @@ def cleanup_agent(classified_instruction: Dict[str, Any], slide_context: Dict[st
             }
             processed_subtasks.append(flattened_task)
 
-    logging.info(f"Processed subtasks for cleanup agent final: {processed_subtasks}")
     return processed_subtasks

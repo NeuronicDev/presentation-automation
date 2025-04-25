@@ -1,0 +1,10 @@
+{
+  "refined_instructions": [
+    "Vertically align shapes (ids: [475, 478, 472]) on the left side of the slide.",
+    "Vertically align shapes (ids: [474, 477, 480, 481]) on the left side of the slide.",
+    "Vertically distribute shapes (ids: [464, 465, 466, 468]) to have equal spacing between them.",
+    "Vertically distribute shapes (ids: [512, 513, 514, 515]) on the right side to have equal spacing between them.",
+    "Distribute vertically the text boxes (ids: [473, 476, 479]) on the left side with equal spacing between them.",
+    "Align vertically the group shapes (ids: [497, 500, 503, 506]) at the center."
+  ]
+}

@@ -1,10 +1,8 @@
 import logging, json, re
 from typing import Dict, Any, List
 from langchain_core.messages import HumanMessage
-
 from config.llmProvider import gemini_flash_llm
 from config.config import LLM_API_KEY
-
 from google import genai
 client = genai.Client(api_key=LLM_API_KEY)
 
@@ -224,6 +222,4 @@ def visual_enhancement_agent(classified_instruction: Dict[str, Any], slide_conte
                 "params": params
             }
             processed_subtasks.append(flattened_task)
-
-    logging.info(f"Processed subtasks for visual_enhancement_agent final: {processed_subtasks}")
     return processed_subtasks

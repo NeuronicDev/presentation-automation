@@ -1,0 +1,832 @@
+[
+  {
+    "id": "458",
+    "name": "Google Shape;458;p1",
+    "parentGroupId": null,
+    "top": 11.7451181102362,
+    "left": 51.366062992126,
+    "width": 678.410787401575,
+    "height": 29.0812598425197,
+    "text": "Xxxx",
+    "type": "Placeholder",
+    "altText": "",
+    "zIndex": 0,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 48,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "460",
+    "name": "Google Shape;460;p1",
+    "parentGroupId": null,
+    "top": 167.408031496063,
+    "left": 49.5000787401575,
+    "width": 13.124094488189,
+    "height": 280.338346456693,
+    "text": "",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 1,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "475"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "461",
+    "name": "Google Shape;461;p1",
+    "parentGroupId": null,
+    "top": 67.6173228346457,
+    "left": 148.833858267717,
+    "width": 233.937244094488,
+    "height": 18.2729921259843,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 2,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "464",
+    "name": "Google Shape;464;p1",
+    "parentGroupId": null,
+    "top": 167.408031496063,
+    "left": 148.833858267717,
+    "width": 233.937244094488,
+    "height": 68.844094488189,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 3,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "465",
+    "name": "Google Shape;465;p1",
+    "parentGroupId": null,
+    "top": 248.102598425197,
+    "left": 148.833858267717,
+    "width": 233.937244094488,
+    "height": 106.213228346457,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 4,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "475"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "466",
+    "name": "Google Shape;466;p1",
+    "parentGroupId": null,
+    "top": 365.687480314961,
+    "left": 152.004724409449,
+    "width": 233.937244094488,
+    "height": 78.2776377952756,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 5,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "467",
+    "name": "Google Shape;467;p1",
+    "parentGroupId": null,
+    "top": 455.815748031496,
+    "left": 52.6709448818898,
+    "width": 89.9351181102362,
+    "height": 58.1625196850394,
+    "text": "",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 6,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "481"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "468",
+    "name": "Google Shape;468;p1",
+    "parentGroupId": null,
+    "top": 455.815669291339,
+    "left": 152.004724409449,
+    "width": 233.937244094488,
+    "height": 58.1625196850394,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 7,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "469",
+    "name": "Google Shape;469;p1",
+    "parentGroupId": null,
+    "top": 241.643464566929,
+    "left": 149.463385826772,
+    "width": 761.036614173228,
+    "height": 0,
+    "text": "",
+    "type": "Line",
+    "altText": "",
+    "zIndex": 8,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "470",
+    "name": "Google Shape;470;p1",
+    "parentGroupId": null,
+    "top": 359.22842519685,
+    "left": 152.634251968504,
+    "width": 761.036614173228,
+    "height": 0,
+    "text": "",
+    "type": "Line",
+    "altText": "",
+    "zIndex": 9,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "471",
+    "name": "Google Shape;471;p1",
+    "parentGroupId": null,
+    "top": 449.356456692913,
+    "left": 152.634251968504,
+    "width": 761.036614173228,
+    "height": 0,
+    "text": "",
+    "type": "Line",
+    "altText": "",
+    "zIndex": 10,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "472",
+    "name": "Google Shape;472;p1",
+    "parentGroupId": null,
+    "top": 169.920393700787,
+    "left": 64.8474015748031,
+    "width": 77.55,
+    "height": 72.5252755905512,
+    "text": "",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 11,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "473",
+      "474",
+      "477"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "473",
+    "name": "Google Shape;473;p1",
+    "parentGroupId": null,
+    "top": 167.406929133858,
+    "left": 67.3588188976378,
+    "width": 72.5252755905512,
+    "height": 73.1970078740158,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 12,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "472",
+      "474"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 18,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "474",
+    "name": "Google Shape;474;p1",
+    "parentGroupId": null,
+    "top": 158.844488188976,
+    "left": 62.9244881889764,
+    "width": 18,
+    "height": 18,
+    "text": "",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 13,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "472",
+      "473"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "475",
+    "name": "Google Shape;475;p1",
+    "parentGroupId": null,
+    "top": 264.946299212598,
+    "left": 50.5157480314961,
+    "width": 106.212834645669,
+    "height": 72.5252755905512,
+    "text": "",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 14,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "460",
+      "465",
+      "476"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "476",
+    "name": "Google Shape;476;p1",
+    "parentGroupId": null,
+    "top": 256.807007874016,
+    "left": 67.3595275590551,
+    "width": 72.5252755905512,
+    "height": 88.8009448818898,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 15,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "475",
+      "477"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 18,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "477",
+    "name": "Google Shape;477;p1",
+    "parentGroupId": null,
+    "top": 241.783070866142,
+    "left": 62.9244881889764,
+    "width": 18,
+    "height": 18,
+    "text": "",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 16,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "472",
+      "476"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "478",
+    "name": "Google Shape;478;p1",
+    "parentGroupId": null,
+    "top": 372.916614173228,
+    "left": 63.3010236220472,
+    "width": 86.9835433070866,
+    "height": 72.5252755905512,
+    "text": "",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 17,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "479",
+      "480"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "479",
+    "name": "Google Shape;479;p1",
+    "parentGroupId": null,
+    "top": 374.392125984252,
+    "left": 70.5283464566929,
+    "width": 72.5252755905512,
+    "height": 69.5716535433071,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 18,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "478",
+      "480"
+    ],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 18,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "480",
+    "name": "Google Shape;480;p1",
+    "parentGroupId": null,
+    "top": 360.570157480315,
+    "left": 66.0953543307087,
+    "width": 18,
+    "height": 18,
+    "text": "",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 19,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "478",
+      "479"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "481",
+    "name": "Google Shape;481;p1",
+    "parentGroupId": null,
+    "top": 459.287952755906,
+    "left": 57.5953543307087,
+    "width": 18,
+    "height": 18,
+    "text": "",
+    "type": "GeometricShape",
+    "altText": "",
+    "zIndex": 20,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [
+      "467"
+    ],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "482",
+    "name": "Google Shape;482;p1",
+    "parentGroupId": null,
+    "top": 67.4025984251969,
+    "left": 401.108267716535,
+    "width": 416.178267716535,
+    "height": 18.2729921259843,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 21,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "485",
+    "name": "Google Shape;485;p1",
+    "parentGroupId": null,
+    "top": 139.603937007874,
+    "left": 401.10842519685,
+    "width": 129.89157480315,
+    "height": 18.2729921259843,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 22,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "488",
+    "name": "Google Shape;488;p1",
+    "parentGroupId": null,
+    "top": 139.603937007874,
+    "left": 541.957795275591,
+    "width": 129.89157480315,
+    "height": 18.2729921259843,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 23,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "491",
+    "name": "Google Shape;491;p1",
+    "parentGroupId": null,
+    "top": 139.603937007874,
+    "left": 687.395039370079,
+    "width": 129.89157480315,
+    "height": 18.2729921259843,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 24,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "494",
+    "name": "Google Shape;494;p1",
+    "parentGroupId": null,
+    "top": 67.4025984251969,
+    "left": 836.292834645669,
+    "width": 233.937244094488,
+    "height": 18.2729921259843,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 25,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "497",
+    "name": "Google Shape;497;p1",
+    "parentGroupId": null,
+    "top": 189.747007874016,
+    "left": 597.114330708661,
+    "width": 24.1661417322835,
+    "height": 24.1661417322835,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 26,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "500",
+    "name": "Google Shape;500;p1",
+    "parentGroupId": null,
+    "top": 392.20937007874,
+    "left": 720.864645669291,
+    "width": 24.1661417322835,
+    "height": 24.1661417322835,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 27,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "503",
+    "name": "Google Shape;503;p1",
+    "parentGroupId": null,
+    "top": 273.323228346457,
+    "left": 594.820472440945,
+    "width": 24.1661417322835,
+    "height": 24.1661417322835,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 28,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "506",
+    "name": "Google Shape;506;p1",
+    "parentGroupId": null,
+    "top": 477.287952755906,
+    "left": 457.141968503937,
+    "width": 24.1661417322835,
+    "height": 24.1661417322835,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 29,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "509",
+    "name": "Google Shape;509;p1",
+    "parentGroupId": null,
+    "top": 273.322834645669,
+    "left": 717.693779527559,
+    "width": 24.1661417322835,
+    "height": 24.1661417322835,
+    "text": "",
+    "type": "Group",
+    "altText": "",
+    "zIndex": 30,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": null,
+      "size": null,
+      "bold": false,
+      "italic": false
+    },
+    "textAlign": null
+  },
+  {
+    "id": "512",
+    "name": "Google Shape;512;p1",
+    "parentGroupId": null,
+    "top": 167.408031496063,
+    "left": 833.121968503937,
+    "width": 322.667480314961,
+    "height": 68.844094488189,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 31,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "513",
+    "name": "Google Shape;513;p1",
+    "parentGroupId": null,
+    "top": 248.102519685039,
+    "left": 833.121968503937,
+    "width": 322.667480314961,
+    "height": 106.212834645669,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 32,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "514",
+    "name": "Google Shape;514;p1",
+    "parentGroupId": null,
+    "top": 365.687480314961,
+    "left": 836.292834645669,
+    "width": 319.496614173228,
+    "height": 78.2776377952756,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 33,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  },
+  {
+    "id": "515",
+    "name": "Google Shape;515;p1",
+    "parentGroupId": null,
+    "top": 455.815669291339,
+    "left": 836.292834645669,
+    "width": 233.937244094488,
+    "height": 58.1625196850394,
+    "text": "Xxxx",
+    "type": "TextBox",
+    "altText": "",
+    "zIndex": 34,
+    "isLikelyIcon": false,
+    "slideIndex": 0,
+    "overlapsWith": [],
+    "font": {
+      "name": "Trebuchet MS",
+      "size": 16,
+      "bold": false,
+      "italic": false
+    }
+  }
+]

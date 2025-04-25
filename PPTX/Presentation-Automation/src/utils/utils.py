@@ -88,7 +88,7 @@ def generate_slide_image(pdf_path: str, slide_index: int) -> Tuple[str, bytes]:
 
 def generate_slide_context(prs: Presentation, slide_number: int, pdf_path: str, output_dir: str) -> Dict:
     try:
-        slide_index = slide_number - 1
+        slide_index = slide_number 
         os.makedirs(output_dir, exist_ok=True)
 
         # Generate image

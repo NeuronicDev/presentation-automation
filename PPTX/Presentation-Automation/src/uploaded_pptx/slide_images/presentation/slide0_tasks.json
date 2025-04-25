@@ -1,0 +1,68 @@
+[
+    {
+        "agent_name": "cleanup",
+        "slide_number": 0,
+        "original_instruction": "cleanup",
+        "task_description": "Vertically align the chevrons (shapes with IDs 475, 478) and home plate shape (shape with ID 472) on the left side of the slide to ensure they are properly aligned with each other, creating a visually consistent flow.",
+        "action": "align_elements",
+        "target_element_hint": "chevrons and home plate on the left",
+        "params": {
+            "alignment": "vertical_center"
+        }
+    },
+    {
+        "agent_name": "cleanup",
+        "slide_number": 0,
+        "original_instruction": "cleanup",
+        "task_description": "Vertically align the ellipses with text 'a', 'b', 'c' and 'd' (shapes with IDs 474, 477, 480 and 481) on the left side of the slide to ensure they are properly aligned with each other, creating a visually consistent flow.",
+        "action": "align_elements",
+        "target_element_hint": "ellipses with text on the left",
+        "params": {
+            "alignment": "vertical_center"
+        }
+    },
+    {
+        "agent_name": "cleanup",
+        "slide_number": 0,
+        "original_instruction": "cleanup",
+        "task_description": "Vertically distribute the rectangular shapes with bullet points (shapes with IDs 464, 465, 466) and the rectangular shape with text 'Xxxx' to have equal spacing between them and create a visually consistent flow.",
+        "action": "distribute_elements",
+        "target_element_hint": "rectangular shapes with text and bullets",
+        "params": {
+            "distribution_axis": "vertical"
+        }
+    },
+    {
+        "agent_name": "cleanup",
+        "slide_number": 0,
+        "original_instruction": "cleanup",
+        "task_description": "Vertically distribute the rectangular shapes with text 'Xxxx' (shapes with IDs 512, 513, 514 and 515) on the right side to have equal spacing between them and create a visually consistent flow.",
+        "action": "distribute_elements",
+        "target_element_hint": "rectangular shapes with text on the right side",
+        "params": {
+            "distribution_axis": "vertical"
+        }
+    },
+    {
+        "agent_name": "cleanup",
+        "slide_number": 0,
+        "original_instruction": "cleanup",
+        "task_description": "Align vertically the rectangular shapes with text 'Xxxx' (shapes with IDs 473, 476 and 479) on the left side to have equal spacing between them and create a visually consistent flow.",
+        "action": "align_elements",
+        "target_element_hint": "rectangular shapes with text on the left side",
+        "params": {
+            "alignment": "vertical_center"
+        }
+    },
+    {
+        "agent_name": "cleanup",
+        "slide_number": 0,
+        "original_instruction": "cleanup",
+        "task_description": "Align vertically the ellipses inside group shapes (shapes with IDs 497, 500, 503 and 506) on the center-right side of the slide to ensure they are properly aligned with each other, creating a visually consistent flow.",
+        "action": "align_elements",
+        "target_element_hint": "ellipses inside group shapes on the center-right side",
+        "params": {
+            "alignment": "vertical_center"
+        }
+    }
+]

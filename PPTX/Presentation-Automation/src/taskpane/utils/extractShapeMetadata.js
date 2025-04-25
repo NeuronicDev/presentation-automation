@@ -1,150 +1,149 @@
 async function extractAllSlideShapes() {
-    return PowerPoint.run(async (context) => {
-      const slides = context.presentation.slides;
-      slides.load("items");
-      await context.sync();
-      if (!slides.items || slides.items.length === 0) {
-        console.warn("Presentation contains no slides.");
-        return [];
-      }
-      console.log(`Found ${slides.items.length} slides. Processing metadata...`);
-      const allMetadata = [];
-      function isOverlapping(a, b) {
-        return !(
-          a.left + a.width < b.left ||
-          b.left + b.width < a.left ||
-          a.top + a.height < b.top ||
-          b.top + b.height < a.top
-        );
-      }
+  console.log("[Sync Metadata] Starting full metadata extraction...");
+  let overallSuccess = true;
 
-      async function extractShapeDetails(shape, context, slideIndex, zIndex, parentGroupId = null) {
-        try {
-          shape.load("id, name, left, top, width, height, type, altTextDescription");
+  try {
+      await PowerPoint.run(async (context) => {
+          const slides = context.presentation.slides;
+          slides.load("items/id");
           await context.sync();
-  
-          let shapeText = "";
-          let typeName = shape.type || "Unknown";
-          let fontName = null;
-          let fontSize = null;
-          let fontBold = false;
-          let fontItalic = false;
-          let textAlign = null;
 
-          try {
-            if (shape.textFrame) {
-              shape.textFrame.load("textRange");
-              await context.sync();
-  
-              if (shape.textFrame.textRange) {
-                const textRange = shape.textFrame.textRange;
-                textRange.load("text, font/name, font/size, font/bold, font/italic, textAlign");
-                await context.sync();
-                shapeText = textRange.text ? textRange.text.trim() : "";
-                fontName = textRange.font.name;
-                fontSize = textRange.font.size;
-                fontBold = textRange.font.bold;
-                fontItalic = textRange.font.italic;
-                textAlign = textRange.textAlign;
+          if (!slides.items || slides.items.length === 0) {
+              console.warn("[Sync Metadata] Presentation contains no slides.");
+              return;
+          }
+          const slideCount = slides.items.length;
+          console.log(`[Sync Metadata] Found ${slideCount} slides. Processing sequentially...`);
+
+          for (let s = 0; s < slideCount; s++) {
+              console.log(`[Sync Metadata] ---> Processing Slide Index ${s}...`);
+              let currentSlideMetadata = [];
+              let slideSuccess = false;
+
+              try {
+                  const slide = context.presentation.slides.getItemAt(s);
+                  const shapes = slide.shapes;
+                  shapes.load("items/id, items/name, items/left, items/top, items/width, items/height, items/type, items/altTextDescription");
+                  await context.sync();
+
+                  const shapesItems = shapes.items;
+                  const shapesToGetTextFrom = [];
+                  const basicMetadataMap = new Map();
+
+                  for (let i = 0; i < shapesItems.length; i++) {
+                      const shape = shapesItems[i];
+                      const standardizedName = `Google Shape;${shape.id};p${s + 1}`;
+                      const shapeData = {
+                          id: shape.id,
+                          name: standardizedName,
+                          parentGroupId: null,
+                          top: shape.top, left: shape.left,
+                          width: shape.width, height: shape.height,
+                          text: "",
+                          type: shape.type || "Unknown",
+                          altText: shape.altTextDescription || "",
+                          zIndex: i,
+                          isLikelyIcon: shape.type === "Graphic" || (shape.name?.toLowerCase().includes("icon")),
+                          slideIndex: s,
+                          overlapsWith: [],
+                          font: { name: null, size: null, bold: false, italic: false },
+                          textAlign: null
+                      };
+                      basicMetadataMap.set(shape.id, shapeData);
+
+                      if (shape.type === 'TextBox' || shape.type === 'Placeholder' || shape.type.includes('Text')) {
+                          shapesToGetTextFrom.push(shape);
+                      }
+                  }
+
+                  for (let i = 0; i < shapesItems.length; i++) {
+                      const shapeA = shapesItems[i];
+                      for (let j = i + 1; j < shapesItems.length; j++) {
+                          const shapeB = shapesItems[j];
+                          if (isOverlapping(shapeA, shapeB)) {
+                              basicMetadataMap.get(shapeA.id).overlapsWith.push(shapeB.id);
+                              basicMetadataMap.get(shapeB.id).overlapsWith.push(shapeA.id);
+                          }
+                      }
+                  }
+
+                  if (shapesToGetTextFrom.length > 0) {
+                      console.log(`[Sync Metadata] Slide ${s}: Loading text for ${shapesToGetTextFrom.length} shapes...`);
+                      for (const shape of shapesToGetTextFrom) {
+                          shape.load("textFrame/textRange/text, textFrame/textRange/font/name, textFrame/textRange/font/size, textFrame/textRange/font/bold, textFrame/textRange/font/italic, textFrame/textRange/textAlign");
+                      }
+                      await context.sync();
+
+                      for (const shape of shapesToGetTextFrom) {
+                          const entry = basicMetadataMap.get(shape.id);
+                          if (!entry) continue;
+
+                          try {
+                              const tr = shape.textFrame?.textRange;
+                              if (tr) {
+                                  entry.text = tr.text?.trim() || "";
+                                  entry.font.name = tr.font.name;
+                                  entry.font.size = tr.font.size;
+                                  entry.font.bold = tr.font.bold;
+                                  entry.font.italic = tr.font.italic;
+                                  entry.textAlign = tr.textAlign;
+                              }
+                          } catch (textError) {
+                              if (!textError.message?.includes("RichApi.Error")) {
+                                  console.warn(`[Sync Metadata] Slide ${s}: Could not load text for shape ID ${shape.id}: ${textError.message}`);
+                              }
+                          }
+                      }
+                      console.log(`[Sync Metadata] Slide ${s}: Text loading complete.`);
+                  }
+                  currentSlideMetadata = Array.from(basicMetadataMap.values());
+                  console.log(currentSlideMetadata) ////////////////////////////////////////////////////////////////
+                  slideSuccess = true;
+              } catch (slideError) {
+                  console.error(`[Sync Metadata] Failed to process slide index ${s}:`, slideError);
+                  overallSuccess = false;
               }
-            }
-          } catch (_) {
+
+              if (slideSuccess && currentSlideMetadata.length > 0) {
+                  console.log(`[Sync Metadata] Slide ${s} processed. Uploading metadata_${s}.json...`);
+                  try {
+                      const response = await fetch("http://localhost:8000/upload-metadata", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                              filename: `metadata_${s}.json`,
+                              path: "slide_images/metadata",
+                              data: currentSlideMetadata
+                          })
+                      });
+
+                      if (!response.ok) {
+                          throw new Error(`Upload failed with status ${response.status}`);
+                      }
+                      const result = await response.json();
+                      console.log(`[Sync Metadata] Slide ${s} metadata uploaded:`, result);
+                  } catch (uploadError) {
+                      console.error(`[Sync Metadata] Upload failed for Slide ${s}:`, uploadError);
+                      overallSuccess = false;
+                  }
+              } else if (slideSuccess) {
+                  console.log(`[Sync Metadata] Slide ${s} had no shapes to upload.`);
+              }
           }
-
-          const isLikelyIcon = typeName === "Graphic" || (shape.name && shape.name.toLowerCase().includes("icon"));
-
-          const shapeData = {
-            id: shape.id,
-            name: shape.name || "",
-            parentGroupId: parentGroupId,
-            top: shape.top,
-            left: shape.left,
-            width: shape.width,
-            height: shape.height,
-            text: shapeText,
-            type: typeName,
-            altText: shape.altTextDescription || "",
-            zIndex: zIndex,
-            isLikelyIcon: isLikelyIcon,
-            slideIndex: slideIndex + 1,
-            overlapsWith: [],
-            font: {
-              name: fontName,
-              size: fontSize,
-              bold: fontBold,
-              italic: fontItalic
-            },
-            textAlign: textAlign
-          };
-  
-          allMetadata.push(shapeData);
-  
-          if (typeName === "Group" && shape.groupItems) {
-            shape.groupItems.load("items");
-            await context.sync();
-  
-            for (let i = 0; i < shape.groupItems.items.length; i++) {
-              await extractShapeDetails(shape.groupItems.items[i], context, slideIndex, `${zIndex}.${i}`, shape.id);
-            }
-          }
-        } catch (err) {
-          console.warn("Skipped shape due to error:", err);
-        }
-      }
-
-      async function processSlide(slide, index) {
-        try {
-          const shapes = slide.shapes;
-          shapes.load("items");
-          await context.sync();
-  
-          for (let i = 0; i < shapes.items.length; i++) {
-            await extractShapeDetails(shapes.items[i], context, index, i);
-          }
-        } catch (err) {
-          console.error(`Error processing slide ${index}:`, err);
-        }
-      }
-
-    // Process each slide
-    for (let s = 0; s < slides.items.length; s++) {
-        await processSlide(slides.items[s], s);
-      }
-  
-      // Calculate overlaps (only within same slide)
-      for (let i = 0; i < allMetadata.length; i++) {
-        for (let j = 0; j < allMetadata.length; j++) {
-          if (
-            i !== j &&
-            allMetadata[i].slideIndex === allMetadata[j].slideIndex &&
-            isOverlapping(allMetadata[i], allMetadata[j])
-          ) {
-            allMetadata[i].overlapsWith.push(allMetadata[j].id);
-          }
-        }
-      }
-
-    // Print to console
-    const metadataJSON = JSON.stringify(allMetadata, null, 2);
-    console.log("Extracted Slide Shape Metadata with Text Properties:\n", metadataJSON);
-
-    // Send to backend
-    const filename = `metadata.json`;
-    try {
-      const response = await fetch("http://localhost:8000/upload-metadata", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: filename,
-          path: "slide_images",
-          data: allMetadata
-        })
       });
-      const result = await response.json();
-      console.log("Metadata uploaded to backend:", result);
-    } catch (err) {
-      console.error("Failed to send metadata to backend:", err);
-    }
-    return allMetadata;
-  });
+      console.log("[Sync Metadata] Finished processing all slides.");
+      return overallSuccess;
+  } catch (error) {
+      console.error("[Sync Metadata] Unexpected error during overall process:", error);
+      return false;
+  }
+}
+
+function isOverlapping(shapeA, shapeB) {
+  return !(
+      shapeA.left + shapeA.width < shapeB.left ||
+      shapeA.left > shapeB.left + shapeB.width ||
+      shapeA.top + shapeA.height < shapeB.top ||
+      shapeA.top > shapeB.top + shapeB.height
+  );
 }
