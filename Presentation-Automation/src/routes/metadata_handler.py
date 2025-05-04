@@ -5,7 +5,6 @@ import os, shutil, json, logging, aiofiles
 
 router = APIRouter()
 
-# Define a Pydantic model for the request body
 class MetadataPayload(BaseModel):
     data: dict | list
     filename: str = "metadata.json"
