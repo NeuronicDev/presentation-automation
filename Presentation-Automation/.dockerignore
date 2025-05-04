@@ -1,0 +1,45 @@
+# .dockerignore
+
+node_modules
+
+# Python cache and virtual environment
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+/venv/
+.venv/
+/.venv/
+env/
+/env/
+ENV/
+/ENV/
+
+# OS and editor files
+.DS_Store
+*.suo
+*.user
+*.idea/
+.vscode/
+
+# Git files
+.git/
+.gitignore
+
+# Test files (optional, unless needed in container)
+tests/
+*.test.py
+pytest.ini
+.pytest_cache/
+
+# Local development files
+*.log
+*.db
+*.sqlite3
+*.env
+local_settings.py
+
+
+# # Uploaded files generated during runtime (mount a volume instead)
+# uploaded_pptx/
